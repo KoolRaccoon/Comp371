@@ -1,38 +1,100 @@
 #include "DiscoverySquare.h"
 #include <iostream>
 
-DiscoverySquare::DiscoverySquare(float minx, float maxx, float minz, float maxz)
+DiscoverySquare::DiscoverySquare(float xs, float zs, glm::vec3 cam)
 {
-	//Initially sets the discovery box to half the initial shown square
-	_minX = minx/2;
-	_maxX = maxx/2;
-	_minZ = minz/2;
-	_maxZ = maxz/2;
-
-	//Initial shown square
-	_shownMinX = minx;
-	_shownMaxX = maxx;
-	_shownMinZ = minz;
-	_shownMaxZ = maxz;
+	xSize = xs;
+	zSize = zs;
+	usedData = new vector<vector<tile*>>;
+	initializeUsedData();
 }
 
 DiscoverySquare::~DiscoverySquare()
 {
+	delete usedData;
+	usedData = nullptr;
 }
 
-bool DiscoverySquare::needUpdate(glm::vec3 v)
+vector<vector<tile*>> * DiscoverySquare::update(glm::vec3 v)
 {
-	//std::cout << v.z << " " << _minZ << " " << _maxZ << _shownMinZ << " " << _shownMaxZ <<  std::endl;
-	//Tests to see if the camera is outside the boundary
-	if (v.x < _minX
-		|| v.x > _maxX
-		|| v.z < _minZ
-		|| v.z > _maxZ)
-		return true;
-	else
-		return false;
+	cout << v.x << " " << v.z << " " << endl;
+	cout << data.size() << endl;
+	resetUsedData();
+	int xZero = (int)v.x - xSize / 2;
+	int zZero = (int)v.z - zSize / 2;
+	int xFinal = (int)v.x + xSize / 2;
+	int zFinal = (int)v.z + zSize / 2;
+	for (int i = 0; i < data.size(); i++)
+	{
+		int x = data[i]->x;
+		int z = data[i]->z;
+		if (x >= xZero
+			&& x <= xFinal
+			&& z >= zZero
+			&& z <= zFinal)
+		{
+			(*usedData)[x - xZero][z - zZero] = data[i];
+		}
+	}
+	createTiles(xZero, zZero);
+
+	return usedData;
+}
+void DiscoverySquare::resetUsedData()
+{
+	tile * tempTile = new tile();
+	for (int i = 0; i <= (int)xSize; i++)
+	{
+		for (int j = 0; j <= (int)zSize; j++)
+		{
+			(*usedData)[i][j] = tempTile;
+		}
+	}
+}
+void DiscoverySquare::initializeUsedData()
+{
+	tile * tempTile = new tile();
+	for (int i = 0; i <= (int)xSize; i++)
+	{
+		vector<tile*> temp;
+		for (int j = 0; j <= (int)zSize; j++)
+		{
+			temp.push_back(tempTile);
+		}
+		usedData->emplace_back(temp);
+	}
 }
 
+vector<vector<tile*>> * DiscoverySquare::initializeSquare()
+{
+	createTiles(-(xSize / 2), -(zSize / 2));
+	return usedData;
+}
+
+void DiscoverySquare::createTiles(int x, int z)
+{
+	int count = 0;
+	for (int i = 0; i < usedData->size(); i++)
+	{
+		for (int j = 0; j < (*usedData)[i].size(); j++)
+		{
+			if ((*usedData)[i][j]->tileType() == EMPTY)
+			{
+				count++;
+				glm::vec3 * pos = new glm::vec3(i + x, 0.0f, j + z);
+				tileBuilder * ctb = new cityTileBuilder(shaders[CITY], pos);
+				ctb->createTile();
+				(*usedData)[i][j] = ctb->getTile();
+				data.push_back(ctb->getTile());
+			}
+		}
+	}
+}
+void DiscoverySquare::addShader(Shader * s)
+{
+	shaders.push_back(s);
+}
+/*
 std::vector<glm::vec3> DiscoverySquare::getTransl(glm::vec3 v)
 {
 	std::vector<glm::vec3> transl;
@@ -80,4 +142,4 @@ std::vector<glm::vec3> DiscoverySquare::getTransl(glm::vec3 v)
 		_shownMaxZ++;
 	}
 	return transl;
-}
+}*/

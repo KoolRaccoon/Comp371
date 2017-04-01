@@ -1,28 +1,44 @@
 #pragma once
-#include "..\glm/glm.hpp"
-#include "..\glm/gtc/matrix_transform.hpp"
-#include "..\glm/gtc/type_ptr.hpp"
+#include "stdafx.h"
 #include <vector>
+#include "tile.h"
+#include "cityTileBuilder.h"
+#include "Shader.h"
 
+using namespace std;
 //Class used to send a boundary of discovery to load new tiles
 class DiscoverySquare {
 public:
-	//Recieves the current shown tiles as parameters
-	DiscoverySquare(float minx, float maxx, float minz, float maxz);
+	/*Parameter constructor, no default constructor, takes the width and length
+	* of the square and the position of the camera (usually (0.0, 0.0, 0.0))
+	*/
+	DiscoverySquare(float xsize, float zsize, glm::vec3 camPos);
+	//Default destructor
 	~DiscoverySquare();
-	//Returns true if the camera is stepping outside the discovery square
-	bool needUpdate(glm::vec3 v);
-	//Returns a vector containing all the translations to fill the new line of tiles
-	std::vector<glm::vec3> getTransl(glm::vec3 v);
+	//Updates the tiles according to the new camera position
+	vector<vector<tile*>> * update(glm::vec3 position);
+	//Resets used data to be centered around the new position
+	void resetUsedData();
+	//Returns the first set of tiles. Is used once to generate the data of the initial tiles
+	vector<vector<tile*>> * initializeSquare();
+	//Adds a shader, declared in the main, to the list of initialized shaders to used from.
+	void addShader(Shader * shader);
+	
 
 private:
-	float _minX;
-	float _maxX;
-	float _minZ;
-	float _maxZ;
+	//Creates the initial used data. Only used by the constructor
+	void initializeUsedData();
+	//Creates tiles for each tile of type EMPTY in usedData
+	void createTiles(int smallestX, int smallestZ);
 
-	float _shownMinX;
-	float _shownMaxX;
-	float _shownMinZ;
-	float _shownMaxZ;
+	float xSize;
+	float zSize;
+	
+	//Data of all created tiles
+	vector<tile*> data;
+
+	//Data that is actually shown on screen
+	vector<vector<tile*>> * usedData;
+
+	vector<Shader*> shaders;
 };
