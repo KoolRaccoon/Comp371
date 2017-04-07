@@ -15,11 +15,7 @@ public:
 		return _tile;
 	}
 	//Single call to create a tile
-	void createTile()
-	{
-		_tile = new tile;
-		build();
-	}
+	virtual void createTile() = 0;
 	virtual void buildType() = 0;
 	virtual void buildVertices() = 0;
 	virtual void buildDrawType() = 0;

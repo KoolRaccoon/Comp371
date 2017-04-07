@@ -3,7 +3,7 @@
 #include "Shader.h"
 const unsigned int EMPTY = 0;
 const unsigned int CITY = 1;
-const unsigned int GROUND = 2;
+const unsigned int ROCK = 2;
 
 using namespace std;
 class tile
@@ -28,6 +28,7 @@ public:
 	Shader * getShader();
 	//Returns a pointer to the position of the tile, you can also use x and z
 	glm::vec3 * getPosition();
+	virtual vector<vector<GLfloat>> * getGrid() { return nullptr; };
 
 	/*
 	*			MUTATORS
@@ -39,6 +40,7 @@ public:
 	void setVertices(vector<GLfloat> * vertices);
 	void setPosition(glm::vec3 * position);
 	void setTextures(GLuint &t1, GLuint &t2);
+	virtual void setGrid(vector<vector<GLfloat>> * grid) {};
 	//Returns position.x;
 	int x;
 	//Returns position.z;

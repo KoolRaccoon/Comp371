@@ -44,3 +44,9 @@ void cityTileBuilder::buildPosition()
 {
 	_tile->setPosition(_position);
 }
+
+void cityTileBuilder::createTile()
+{
+	_tile = new tile;
+	build();
+}

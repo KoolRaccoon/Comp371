@@ -15,4 +15,5 @@ public:
 	virtual void buildDrawType();
 	virtual void buildShader();
 	virtual void buildPosition();
+	virtual void createTile();
 };

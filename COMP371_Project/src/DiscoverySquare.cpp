@@ -82,10 +82,13 @@ void DiscoverySquare::createTiles(int x, int z)
 			{
 				count++;
 				glm::vec3 * pos = new glm::vec3(i + x, 0.0f, j + z);
+				//tileBuilder * rtb = new rockTileBuilder(shaders[ROCK], pos, usedData, i, j);
 				tileBuilder * ctb = new cityTileBuilder(shaders[CITY], pos);
 				ctb->createTile();
 				(*usedData)[i][j] = ctb->getTile();
 				data.push_back(ctb->getTile());
+				delete ctb;
+				ctb = nullptr;
 			}
 		}
 	}
