@@ -3,6 +3,7 @@
 #include <vector>
 #include "tile.h"
 #include "cityTileBuilder.h"
+#include "rockTileBuilder.h"
 #include "Shader.h"
 
 using namespace std;

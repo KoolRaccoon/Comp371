@@ -7,7 +7,7 @@ class rockTileBuilder : public tileBuilder
 {
 public:
 	//Parameter constructor, no default constructor, takes an initialized shader and a position
-	rockTileBuilder(Shader * shader, glm::vec3 * position, vector<vector<tile>> * data, int i, int j);
+	rockTileBuilder(Shader * shader, glm::vec3 * position, vector<vector<tile*>> * data, int i, int j);
 	/*
 	*				BUILDER
 	*	(builds each component of a tile)
@@ -32,7 +32,7 @@ private:
 	void fillTopLeft();
 	void fillTopRight();
 
-	vector<vector<tile>> * _data;
+	vector<vector<tile*>> * _data;
 	int _i, _j;
 	vector<vector<GLfloat>> fill1, fill2;
 	const int _size = 5;

@@ -45,6 +45,7 @@ GLfloat lastFrame = 0.0f;  	// Time of last frame
 							// The MAIN function, from here we start the application and run the game loop
 int main()
 {
+	srand (time(NULL));
 	// Init GLFW
 	glfwInit();
 	// Set all the required options for GLFW
@@ -79,11 +80,12 @@ int main()
 	// Build and compile our shader program
 	Shader * defaultShader = new Shader("vertex.shader", "default.shader");
 	Shader * cityTileShader = new Shader("vertex.shader", "cityTile.shader");
-
+	Shader * rockTileShader = new Shader("vertex.shader", "rockTile.shader");
 	/*Adds the shaders to the discovery square. 
 	* Pls use the order from the tile.h const declarations*/
 	DS.addShader(defaultShader);
 	DS.addShader(cityTileShader);
+	DS.addShader(rockTileShader);
 
 	//Initializes the starting discovered square 
 	tiles = DS.initializeSquare();
@@ -209,7 +211,7 @@ int main()
 				***** or we will need to implement more than one draw for more than one object	*******
 				***** per tile, if so we will need to allow more than one shader per tile or	*******
 				***** create complex shaders													*******/
-				glDrawArrays((*tiles)[i][j]->drawType(), 0, 6);
+				glDrawArrays((*tiles)[i][j]->drawType(), 0, (*tiles)[i][j]->getVertices()->size()/5);
 			}
 		}
 		glBindVertexArray(0);
