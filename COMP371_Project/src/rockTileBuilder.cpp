@@ -58,13 +58,13 @@ void rockTileBuilder::createTile()
 void rockTileBuilder::initializeGrid()
 {
 	if (_i - 1 >= 0)
-		setLeft((int)(*_data)[_i - 1][_j]->tileType()/2);
+		setLeft((*_data)[_i - 1][_j]->tileType());
 	if (_j + 1 < (*_data)[_i].size())
-		setUp((int)(*_data)[_i][_j + 1]->tileType()/2);
+		setUp((*_data)[_i][_j + 1]->tileType());
 	if (_i + 1 < (*_data).size())
-		setRight((int)(*_data)[_i + 1][_j]->tileType()/2);
+		setRight((*_data)[_i + 1][_j]->tileType());
 	if (_j - 1 >= 0)
-		setDown((int)(*_data)[_i][_j - 1]->tileType()/2);
+		setDown((*_data)[_i][_j - 1]->tileType());
 }
 
 void rockTileBuilder::fillGrid()
@@ -92,12 +92,12 @@ void rockTileBuilder::fillGrid()
 	{
 		fillTopRight();
 	}
-	for (int i = 0; i < _size; i++)
+	for (int k = 0; k < _size; k++)
 	{
-		for (int j = 0; j < _size; j++)
+		for (int l = 0; l < _size; l++)
 		{
-			if((*grid)[i][j] == 0)
-				(*grid)[i][j] = (fill1[i][j] + fill2[i][j]) / 2;
+			if((*grid)[k][l] == 0)
+				(*grid)[k][l] = (fill1[k][l] + fill2[k][l]) / 2;
 		}
 	}
 }
@@ -117,7 +117,17 @@ vector<GLfloat>* rockTileBuilder::convertGrid()
 			vertices->push_back(0.0f);
 			vertices->push_back(0.0f);
 			//vertices->push_back(0.0f);
+			if (j < _size - 1)
+			{
+				vertices->push_back(-0.5f + i*offset);
+				vertices->push_back((*grid)[i][j + 1]);
+				vertices->push_back(-0.5f + (j + 1)*offset);
+				vertices->push_back(0.0f);
+				vertices->push_back(0.0f);
+				//vertices->push_back(0.0f);
+			}
 		}
+		/*
 		if (j < _size - 1)
 		{
 			for (int i = 0; i < _size; i++)
@@ -129,7 +139,7 @@ vector<GLfloat>* rockTileBuilder::convertGrid()
 				vertices->push_back(0.0f);
 				//vertices->push_back(0.0f);
 			}
-		}
+		}*/
 	}
 	return vertices;
 }
