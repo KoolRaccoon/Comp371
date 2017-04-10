@@ -17,8 +17,8 @@ DiscoverySquare::~DiscoverySquare()
 
 vector<vector<tile*>> * DiscoverySquare::update(glm::vec3 v)
 {
-	cout << v.x << " " << v.z << " " << endl;
-	cout << data.size() << endl;
+	//cout << v.x << " " << v.z << " " << endl;
+	//cout << data.size() << endl;
 	resetUsedData();
 	int xZero = (int)v.x - xSize / 2;
 	int zZero = (int)v.z - zSize / 2;

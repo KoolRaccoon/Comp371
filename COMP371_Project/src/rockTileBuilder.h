@@ -31,9 +31,10 @@ private:
 	void fillBottomRight();
 	void fillTopLeft();
 	void fillTopRight();
+	float random();
 
 	vector<vector<tile*>> * _data;
 	int _i, _j;
 	vector<vector<GLfloat>> fill1, fill2;
-	const int _size = 5;
+	const int _size = 10;
 };

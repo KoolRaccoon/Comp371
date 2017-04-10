@@ -117,15 +117,18 @@ vector<GLfloat>* rockTileBuilder::convertGrid()
 			vertices->push_back(0.0f);
 			vertices->push_back(0.0f);
 			//vertices->push_back(0.0f);
+			//cout << (*grid)[i][j] << " ";
 			if (j < _size - 1)
 			{
-				vertices->push_back(-0.5f + i*offset);
-				vertices->push_back((*grid)[i][j + 1]);
-				vertices->push_back(-0.5f + (j + 1)*offset);
+				vertices->push_back(-0.5f + (i)*offset);
+				vertices->push_back((*grid)[i][j+1]);
+				vertices->push_back(-0.5f + (j+1)*offset);
 				vertices->push_back(0.0f);
 				vertices->push_back(0.0f);
 				//vertices->push_back(0.0f);
+				//cout << (*grid)[i][j + 1];
 			}
+			//cout << endl;
 		}
 		/*
 		if (j < _size - 1)
@@ -219,14 +222,14 @@ void rockTileBuilder::fillBottomLeft()
 	{
 		for (int l = 1; l < _size; l++)
 		{
-			fill1[k][l] = (*grid)[k][l - 1] + (-1 + ((float)(rand() % 201) / 100));
+			fill1[k][l] = (*grid)[k][l - 1] + random();
 		}
 	}
 	for (int l = 1; l < _size; l++)
 	{
 		for (int k = 1; k < _size; k++)
 		{
-			fill2[k][l] = (*grid)[k - 1][l] + (-1 + ((float)(rand() % 201) / 100));
+			fill2[k][l] = (*grid)[k - 1][l] + random();
 		}
 	}
 }
@@ -238,14 +241,14 @@ void rockTileBuilder::fillBottomRight()
 	{
 		for (int l = 1; l < _size; l++)
 		{
-			fill1[k][l] = (*grid)[k][l - 1] + (-1 + ((float)(rand() % 201) / 100));
+			fill1[k][l] = (*grid)[k][l - 1] + random();
 		}
 	}
 	for (int l = 1; l < _size - 1; l++)
 	{
 		for (int k = _size - 2; k >= 0; k--)
 		{
-			fill2[k][l] = (*grid)[k + 1][l] + (-1 + ((float)(rand() % 201) / 100));
+			fill2[k][l] = (*grid)[k + 1][l] + random();
 		}
 	}
 }
@@ -257,14 +260,14 @@ void rockTileBuilder::fillTopLeft()
 	{
 		for (int l = _size - 2; l >= 0; l--)
 		{
-			fill1[k][l] = (*grid)[k][l + 1] + (-1 + ((float)(rand() % 201) / 100));
+			fill1[k][l] = (*grid)[k][l + 1] + random();
 		}
 	}
 	for (int l = _size - 2; l >= 0; l--)
 	{
 		for (int k = 1; k < _size; k++)
 		{
-			fill2[k][l] = (*grid)[k - 1][l] + (-1 + ((float)(rand() % 201) / 100));
+			fill2[k][l] = (*grid)[k - 1][l] + random();
 		}
 	}
 }
@@ -276,14 +279,19 @@ void rockTileBuilder::fillTopRight()
 	{
 		for (int l = _size - 2; l >= 0; l--)
 		{
-			fill1[k][l] = (*grid)[k][l + 1] + (-1 + ((float)(rand() % 201) / 100));
+			fill1[k][l] = (*grid)[k][l + 1] + random();
 		}
 	}
 	for (int l = _size - 2; l >= 0; l--)
 	{
 		for (int k = _size - 2; k >= 0; k--)
 		{
-			fill2[k][l] = (*grid)[k + 1][l] + (-1 + ((float)(rand() % 201) / 100));
+			fill2[k][l] = (*grid)[k + 1][l] + random();
 		}
 	}
+}
+float rockTileBuilder::random()
+{
+	float rnd = -0.25 + ((float)(rand() % 101) / 150);
+	return rnd;
 }
