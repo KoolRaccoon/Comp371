@@ -222,14 +222,20 @@ void rockTileBuilder::fillBottomLeft()
 	{
 		for (int l = 1; l < _size; l++)
 		{
-			fill1[k][l] = (*grid)[k][l - 1] + random();
+			float height = (*grid)[k][l - 1] + random();
+			if(height < 0 )
+				height = (*grid)[k][l - 1] - random();
+			fill1[k][l] = height;
 		}
 	}
 	for (int l = 1; l < _size; l++)
 	{
 		for (int k = 1; k < _size; k++)
 		{
-			fill2[k][l] = (*grid)[k - 1][l] + random();
+			float height = (*grid)[k - 1][l] + random();
+			if (height < 0)
+				height = (*grid)[k - 1][l] - random();
+			fill2[k][l] = height;
 		}
 	}
 }
@@ -241,14 +247,20 @@ void rockTileBuilder::fillBottomRight()
 	{
 		for (int l = 1; l < _size; l++)
 		{
-			fill1[k][l] = (*grid)[k][l - 1] + random();
+			float height = (*grid)[k][l - 1] + random();
+			if (height < 0)
+				height = (*grid)[k][l - 1] - random();
+			fill1[k][l] = height;
 		}
 	}
 	for (int l = 1; l < _size - 1; l++)
 	{
 		for (int k = _size - 2; k >= 0; k--)
 		{
-			fill2[k][l] = (*grid)[k + 1][l] + random();
+			float height = (*grid)[k + 1][l] + random();
+			if (height < 0)
+				height = (*grid)[k + 1][l] - random();
+			fill2[k][l] = height;
 		}
 	}
 }
@@ -260,14 +272,20 @@ void rockTileBuilder::fillTopLeft()
 	{
 		for (int l = _size - 2; l >= 0; l--)
 		{
-			fill1[k][l] = (*grid)[k][l + 1] + random();
+			float height = (*grid)[k][l + 1] + random();
+			if (height < 0)
+				height = (*grid)[k][l + 1] - random();
+			fill1[k][l] = height;
 		}
 	}
 	for (int l = _size - 2; l >= 0; l--)
 	{
 		for (int k = 1; k < _size; k++)
 		{
-			fill2[k][l] = (*grid)[k - 1][l] + random();
+			float height = (*grid)[k - 1][l] + random();
+			if (height < 0)
+				height = (*grid)[k - 1][l] - random();
+			fill2[k][l] = height;
 		}
 	}
 }
@@ -279,14 +297,20 @@ void rockTileBuilder::fillTopRight()
 	{
 		for (int l = _size - 2; l >= 0; l--)
 		{
-			fill1[k][l] = (*grid)[k][l + 1] + random();
+			float height = (*grid)[k][l + 1] + random();
+			if (height < 0)
+				height = (*grid)[k][l + 1] - random();
+			fill1[k][l] = height;
 		}
 	}
 	for (int l = _size - 2; l >= 0; l--)
 	{
 		for (int k = _size - 2; k >= 0; k--)
 		{
-			fill2[k][l] = (*grid)[k + 1][l] + random();
+			float height = (*grid)[k + 1][l] + random();
+			if (height < 0)
+				height = (*grid)[k + 1][l] - random();
+			fill2[k][l] = height;
 		}
 	}
 }
