@@ -38,6 +38,7 @@ void rockTileBuilder::buildPosition()
 
 void rockTileBuilder::createTile()
 {
+	//Creates tile and initializes its grid and the builder's two grids
 	_tile = new rockTile;
 	vector<vector<GLfloat>> * g = new vector<vector<GLfloat>>;
 	vector<GLfloat> temp;
@@ -48,8 +49,8 @@ void rockTileBuilder::createTile()
 	for (int i = 0; i < _size; i++)
 	{
 		g->push_back(temp);
-		fill1.push_back(temp);
-		fill2.push_back(temp);
+		fillUD.push_back(temp);
+		fillLR.push_back(temp);
 	}
 	_tile->setGrid(g);
 	build();
@@ -57,48 +58,60 @@ void rockTileBuilder::createTile()
 
 void rockTileBuilder::initializeGrid()
 {
-	// UP DOWN NOT WORKING
-	if (_i - 1 >= 0)
+	//Checks to see if a tile exists left right down or up 
+	//of the current tile and sets the grids accordingly
+	if ((_i - 1) >= 0)
+	{
 		setLeft((*_data)[_i - 1][_j]->tileType());
-	if (_j + 1 < (*_data)[_i].size())
-		setUp((*_data)[_i][_j + 1]->tileType());
-	if (_i + 1 < (*_data).size())
+		cout << "setLeft" << endl;
+	}
+		
+	if ((_i + 1) < (*_data).size())
+	{
 		setRight((*_data)[_i + 1][_j]->tileType());
-	if (_j - 1 >= 0)
-		setDown((*_data)[_i][_j - 1]->tileType());
+		cout << "setRight" << endl;
+	}
+	if ((_j + 1) < (*_data)[_i].size())
+	{
+		setUp((*_data)[_i][_j + 1]->tileType()); 
+		cout << "setUp" << endl;
+	}
+	if ((_j - 1) >= 0)
+	{
+		setDown((*_data)[_i][_j - 1]->tileType()); 
+		cout << "setDown" << endl;
+	}
+	fillUD = fillLR = (*(_tile->getGrid()));
 }
 
 void rockTileBuilder::fillGrid()
 {
 	vector<vector<GLfloat>> * grid = _tile->getGrid();
-	int i = 0;
-	int j = 0;
-	if ((*grid)[1][_size - 1] != 0)
-		j = _size - 1;
-	if ((*grid)[_size - 1][1] != 0)
-		i = _size - 1;
-	if (i == 0 && j == 0)
-	{
-		fillBottomLeft();
-	}
-	if (i == 0 && j != 0)
-	{
-		fillTopLeft();
-	}
-	if (i != 0 && j == 0)
-	{
-		fillBottomRight();
-	}
-	if (i != 0 && j != 0)
-	{
-		fillTopRight();
-	}
+	//Checks which pass is needed to fill the grid the applies them
+	if (up && down)
+		fillUpDown();
+	else if (up)
+		fillUp();
+	else if (down)
+		fillDown();
+	if (left && right)
+		fillLeftRight();
+	else if (left)
+		fillLeft();
+	else if (right)
+		fillRight();
+	//Div = amount of passes
+	float div = ((float)(up | down) + (float)(left | right));
+	//No divisions by zero pls (just in case, but shouldnt happen)
+	if (div == 0)
+		div = 1;
+	//Averages the heights and sets the in the tile's grid
 	for (int k = 0; k < _size; k++)
 	{
 		for (int l = 0; l < _size; l++)
 		{
-			if((*grid)[k][l] == 0)
-				(*grid)[k][l] = (fill1[k][l] + fill2[k][l]) / 2;
+			if((*grid)[k][l] == 0 )
+				(*grid)[k][l] = (fillUD[k][l] + fillLR[k][l]) / div;
 		}
 	}
 }
@@ -108,51 +121,73 @@ vector<GLfloat>* rockTileBuilder::convertGrid()
 	vector<GLfloat> * vertices = new vector<GLfloat>;
 	GLfloat offset = 1 / (float)(_size - 1);
 	vector<vector<GLfloat>> * grid = _tile->getGrid();
-	for (int j = 0; j < _size; j++)
+
+	/*Creates one strip starting at the bottom left,
+	* ending at the top right; doing a spiral while 
+	* fitting on the terrain
+	*/
+	for (int i = 0; i < _size - 1; i++)
 	{
-		for (int i = 0; i < _size; i++)
+		
+		vertices->push_back(-0.5f + (i + 1)*offset);
+		vertices->push_back(0);
+		vertices->push_back(-0.5f);
+		vertices->push_back(0.0f);
+		vertices->push_back(0.0f);
+
+
+		vertices->push_back(-0.5f + i*offset);
+		vertices->push_back(0);
+		vertices->push_back(-0.5f);
+		vertices->push_back(0.0f);
+		vertices->push_back(0.0f);
+
+		for (int j = 0; j < _size; j++)
 		{
-			vertices->push_back(-0.5f + i*offset);
-			vertices->push_back((*grid)[i][j]);
+			
+			vertices->push_back(-0.5f + (i + 1)*offset);
+			vertices->push_back((*grid)[i+1][j]);
 			vertices->push_back(-0.5f + j*offset);
 			vertices->push_back(0.0f);
 			vertices->push_back(0.0f);
 			//vertices->push_back(0.0f);
 			//cout << (*grid)[i][j] << " ";
-			if (j < _size - 1)
+			vertices->push_back(-0.5f + i*offset);
+			vertices->push_back((*grid)[i][j]);
+			vertices->push_back(-0.5f + (j)*offset);
+			vertices->push_back(0.0f);
+			vertices->push_back(0.0f);
+			//vertices->push_back(0.0f);
+			//cout << (*grid)[i][j + 1];
+
+			if (j == _size - 1)
 			{
+				vertices->push_back(-0.5f + (i+1)*offset);
+				vertices->push_back(0);
+				vertices->push_back(-0.5f + (j)*offset);
+				vertices->push_back(0.0f);
+				vertices->push_back(0.0f);
 				vertices->push_back(-0.5f + (i)*offset);
-				vertices->push_back((*grid)[i][j+1]);
-				vertices->push_back(-0.5f + (j+1)*offset);
+				vertices->push_back(0);
+				vertices->push_back(-0.5f + (j)*offset);
 				vertices->push_back(0.0f);
 				vertices->push_back(0.0f);
-				//vertices->push_back(0.0f);
-				//cout << (*grid)[i][j + 1];
 			}
 			//cout << endl;
 		}
-		/*
-		if (j < _size - 1)
-		{
-			for (int i = 0; i < _size; i++)
-			{
-				vertices->push_back(-0.5f + i*offset);
-				vertices->push_back((*grid)[i][j + 1]);
-				vertices->push_back(-0.5f + (j + 1)*offset); 
-				vertices->push_back(0.0f);
-				vertices->push_back(0.0f);
-				//vertices->push_back(0.0f);
-			}
-		}*/
+
 	}
+
 	return vertices;
 }
 
 void rockTileBuilder::setUp(unsigned int type)
 {
+	
 	switch (type)
 	{
 	case 1:
+		up = true;
 		break;
 	case 2:
 		vector<vector<GLfloat>> * upGrid = (*_data)[_i][_j + 1]->getGrid();
@@ -161,15 +196,18 @@ void rockTileBuilder::setUp(unsigned int type)
 		{
 			(*tileGrid)[i][_size - 1] = (*upGrid)[i][0];
 		}
+		up = true;
 		break;
 	}
 }
 
 void rockTileBuilder::setDown(unsigned int type)
 {
+	
 	switch (type)
 	{
 	case 1:
+		down = true;
 		break;
 	case 2:
 		vector<vector<GLfloat>> * downGrid = (*_data)[_i][_j - 1]->getGrid();
@@ -178,15 +216,18 @@ void rockTileBuilder::setDown(unsigned int type)
 		{
 			(*tileGrid)[i][0] = (*downGrid)[i][_size - 1];
 		}
+		down = true;
 		break;
 	}
 }
 
 void rockTileBuilder::setLeft(unsigned int type)
 {
+	
 	switch (type)
 	{
 	case 1:
+		left = true;
 		break;
 	case 2:
 		vector<vector<GLfloat>> * leftGrid = (*_data)[_i - 1][_j]->getGrid();
@@ -195,15 +236,18 @@ void rockTileBuilder::setLeft(unsigned int type)
 		{
 			(*tileGrid)[0][j] = (*leftGrid)[_size - 1][j];
 		}
+		left = true;
 		break;
 	}
 }
 
 void rockTileBuilder::setRight(unsigned int type)
 {
+	
 	switch (type)
 	{
 	case 1:
+		right = true;
 		break;
 	case 2:
 		vector<vector<GLfloat>> * rightGrid = (*_data)[_i + 1][_j]->getGrid();
@@ -212,111 +256,115 @@ void rockTileBuilder::setRight(unsigned int type)
 		{
 			(*tileGrid)[_size - 1][j] = (*rightGrid)[0][j];
 		}
+		right = true;
 		break;
 	}
 }
 
-void rockTileBuilder::fillBottomLeft()
+void rockTileBuilder::fillLeft()
 {
 	vector<vector<GLfloat>> * grid = _tile->getGrid();
-	for (int k = 1; k < _size; k++)
+	float height;
+
+	for (int i = left; i < _size - right; i++)
 	{
-		for (int l = 1; l < _size; l++)
+		for (int j = down; j < _size - up; j++)
 		{
-			float height = (*grid)[k][l - 1] + random();
-			if(height < 0 )
-				height = (*grid)[k][l - 1] - random();
-			fill1[k][l] = height;
-		}
-	}
-	for (int l = 1; l < _size; l++)
-	{
-		for (int k = 1; k < _size; k++)
-		{
-			float height = (*grid)[k - 1][l] + random();
+			height = (fillLR)[i - 1][j] + random();
 			if (height < 0)
-				height = (*grid)[k - 1][l] - random();
-			fill2[k][l] = height;
+				height = 0;
+			fillLR[i][j] += height;
+			//fillLR[i][j] = random();
 		}
 	}
 }
 
-void rockTileBuilder::fillBottomRight()
+void rockTileBuilder::fillRight()
 {
 	vector<vector<GLfloat>> * grid = _tile->getGrid();
-	for (int k = _size - 2; k >= 0; k--)
+	float height;
+
+	for (int i = _size - 1 - right; i >= left; i--)
 	{
-		for (int l = 1; l < _size; l++)
+		for (int j = down; j < _size - up; j++)
 		{
-			float height = (*grid)[k][l - 1] + random();
+			height = (fillLR)[i + 1][j] + random();
 			if (height < 0)
-				height = (*grid)[k][l - 1] - random();
-			fill1[k][l] = height;
-		}
-	}
-	for (int l = 1; l < _size - 1; l++)
-	{
-		for (int k = _size - 2; k >= 0; k--)
-		{
-			float height = (*grid)[k + 1][l] + random();
-			if (height < 0)
-				height = (*grid)[k + 1][l] - random();
-			fill2[k][l] = height;
+				height = 0;
+			fillLR[i][j] += height;
+			//fillLR[i][j] = random();
 		}
 	}
 }
 
-void rockTileBuilder::fillTopLeft()
+void rockTileBuilder::fillUp()
 {
 	vector<vector<GLfloat>> * grid = _tile->getGrid();
-	for (int k = 1; k < _size; k++)
+	float height;
+
+	for (int i = left; i < _size - right; i++)
 	{
-		for (int l = _size - 2; l >= 0; l--)
+		for (int j = _size - up - 1; j >= down; j--)
 		{
-			float height = (*grid)[k][l + 1] + random();
+			height = (fillUD)[i][j + 1] + random();
 			if (height < 0)
-				height = (*grid)[k][l + 1] - random();
-			fill1[k][l] = height;
-		}
-	}
-	for (int l = _size - 2; l >= 0; l--)
-	{
-		for (int k = 1; k < _size; k++)
-		{
-			float height = (*grid)[k - 1][l] + random();
-			if (height < 0)
-				height = (*grid)[k - 1][l] - random();
-			fill2[k][l] = height;
+				height = 0;
+			fillUD[i][j] += height;
+			//fillUD[i][j] = random();
 		}
 	}
 }
 
-void rockTileBuilder::fillTopRight()
+void rockTileBuilder::fillDown()
 {
 	vector<vector<GLfloat>> * grid = _tile->getGrid();
-	for (int k = _size - 2; k >= 0; k--)
+	float height;
+
+	for (int i = left; i < _size - right; i++)
 	{
-		for (int l = _size - 2; l >= 0; l--)
+		for (int j = down; j < _size - up; j++)
 		{
-			float height = (*grid)[k][l + 1] + random();
+			height = (fillUD)[i][j - 1] + random();
 			if (height < 0)
-				height = (*grid)[k][l + 1] - random();
-			fill1[k][l] = height;
-		}
-	}
-	for (int l = _size - 2; l >= 0; l--)
-	{
-		for (int k = _size - 2; k >= 0; k--)
-		{
-			float height = (*grid)[k + 1][l] + random();
-			if (height < 0)
-				height = (*grid)[k + 1][l] - random();
-			fill2[k][l] = height;
+				height = 0;
+			fillUD[i][j] += height;
+			//fillUD[i][j] = random();
 		}
 	}
 }
+
+void rockTileBuilder::fillLeftRight()
+{
+	cout << "LeftRight" << endl;
+	fillLeft();
+	fillRight();
+	for (int i = left; i < _size - right; i++)
+	{
+		for (int j = down; j < _size - up; j++)
+		{
+			fillLR[i][j] = fillLR[i][j]/2;
+		}
+	}
+}
+
+void rockTileBuilder::fillUpDown()
+{
+	cout << "UpDown" << endl;
+	fillUp();
+	fillDown();
+	for (int i = left; i < _size - right; i++)
+	{
+		for (int j = down; j < _size - up; j++)
+		{
+			fillUD[i][j] = fillUD[i][j] / 2;
+		}
+	}
+}
+
 float rockTileBuilder::random()
 {
-	float rnd = -0.25 + ((float)(rand() % 101) / 150);
+	float rnd = (float)-0.2 + ((rand() % 101) / (float)250.0);
+	//float rnd = (rand() % 101) / (float)100.0;
+	//float rnd = (-1 + rand() % 4) * 0.01f;
 	return rnd;
 }
