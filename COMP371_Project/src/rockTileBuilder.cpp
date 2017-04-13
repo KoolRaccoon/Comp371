@@ -57,6 +57,7 @@ void rockTileBuilder::createTile()
 
 void rockTileBuilder::initializeGrid()
 {
+	// UP DOWN NOT WORKING
 	if (_i - 1 >= 0)
 		setLeft((*_data)[_i - 1][_j]->tileType());
 	if (_j + 1 < (*_data)[_i].size())

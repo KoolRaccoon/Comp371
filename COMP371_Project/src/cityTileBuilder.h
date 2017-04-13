@@ -16,4 +16,6 @@ public:
 	virtual void buildShader();
 	virtual void buildPosition();
 	virtual void createTile();
+private:
+	void _createBuilding(vector<GLfloat> * vertices);
 };

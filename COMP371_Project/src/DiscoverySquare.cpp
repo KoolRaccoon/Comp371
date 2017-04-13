@@ -61,7 +61,7 @@ void DiscoverySquare::initializeUsedData()
 		{
 			temp.push_back(tempTile);
 		}
-		usedData->emplace_back(temp);
+		usedData->push_back(temp);
 	}
 }
 
