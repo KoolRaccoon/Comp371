@@ -75,6 +75,8 @@ int main()
 	glViewport(0, 0, WIDTH, HEIGHT);
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	//glFrontFace(GL_CCW);
 
 
 	// Build and compile our shader program
@@ -264,6 +266,10 @@ void do_movement()
 	{
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 		tiles = DS.update(cameraPos);
+	}
+	if (keys[GLFW_KEY_SPACE])
+	{
+		cameraPos += glm::vec3(0.0f, cameraSpeed, 0.0f);
 	}
 	//Checks if the camera has moved outside the boundary
 	

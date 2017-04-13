@@ -24,11 +24,11 @@ public:
 	vector<vector<tile*>> * initializeSquare();
 	//Adds a shader, declared in the main, to the list of initialized shaders to used from.
 	void addShader(Shader * shader);
-	
+	//Creates the initial used data. 
+	void initializeUsedData();
 
 private:
-	//Creates the initial used data. Only used by the constructor
-	void initializeUsedData();
+	
 	//Creates tiles for each tile of type EMPTY in usedData
 	void createTiles(int smallestX, int smallestZ);
 
