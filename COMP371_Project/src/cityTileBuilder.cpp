@@ -17,6 +17,8 @@ void cityTileBuilder::buildVertices()
 		-0.5f,   0.0f, 0.5f,    0.0f, 1.0f,    // Top Left
 		0.5f,  0.0f,   -0.5f,  1.0f, 0.0f,   // Bottom Right
 		0.5f,   0.0f,  0.5f,   1.0f, 1.0f,   // Top Right
+		//Invisible triangle to avoid mesh creation between strips
+		0.0f, 0.0f, 0.0f, 0.0f, 0.0f
 		
 		/*//Bottom triangle
 		// Positions          //Temporary Texture Coords
