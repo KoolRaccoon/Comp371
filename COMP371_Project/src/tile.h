@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "Shader.h"
+#include "building.h"
 const unsigned int EMPTY = 0;
 const unsigned int CITY = 1;
 const unsigned int ROCK = 2;
@@ -29,6 +30,7 @@ public:
 	//Returns a pointer to the position of the tile, you can also use x and z
 	glm::vec3 * getPosition();
 	virtual vector<vector<GLfloat>> * getGrid() { return nullptr; };
+	virtual vector<building*> * getBuildings() { return nullptr; };
 
 	/*
 	*			MUTATORS
@@ -41,6 +43,8 @@ public:
 	void setPosition(glm::vec3 * position);
 	void setTextures(GLuint &t1, GLuint &t2);
 	virtual void setGrid(vector<vector<GLfloat>> * grid) {};
+	virtual void addBuilding(building * building) {};
+	
 	//Returns position.x;
 	int x;
 	//Returns position.z;
