@@ -26,12 +26,13 @@ public:
 	void addShader(Shader * shader);
 	//Creates the initial used data. 
 	void initializeUsedData();
+	static unsigned int selectTile(int worldx, int worldz);
 
 private:
 	
 	//Creates tiles for each tile of type EMPTY in usedData
 	void createTiles(int smallestX, int smallestZ);
-	unsigned int selectTile(int worldx, int worldz);
+	
 
 	float xSize;
 	float zSize;

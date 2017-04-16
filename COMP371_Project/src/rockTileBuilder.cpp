@@ -1,4 +1,5 @@
 #include "rockTileBuilder.h"
+#include "DiscoverySquare.h"
 
 
 rockTileBuilder::rockTileBuilder(Shader * s, glm::vec3 * p, vector<vector<tile*>> * data, int i, int j) :tileBuilder(s, p) 
@@ -58,6 +59,8 @@ void rockTileBuilder::createTile()
 
 void rockTileBuilder::initializeGrid()
 {
+	float x = _position->x;
+	float z = _position->z;
 	//Checks to see if a tile exists left right down or up 
 	//of the current tile and sets the grids accordingly
 	if ((_i - 1) >= 0)
@@ -65,21 +68,37 @@ void rockTileBuilder::initializeGrid()
 		setLeft((*_data)[_i - 1][_j]->tileType());
 		//cout << "setLeft" << endl;
 	}
+	else if((DiscoverySquare::selectTile(x - 1, z)) == CITY)
+	{
+		setLeft(CITY);
+	}
 		
 	if ((_i + 1) < (*_data).size())
 	{
 		setRight((*_data)[_i + 1][_j]->tileType());
 		//cout << "setRight" << endl;
 	}
+	else if ((DiscoverySquare::selectTile(x + 1, z)) == CITY)
+	{
+		setRight(CITY);
+	}
 	if ((_j + 1) < (*_data)[_i].size())
 	{
 		setUp((*_data)[_i][_j + 1]->tileType()); 
 		//cout << "setUp" << endl;
 	}
+	else if ((DiscoverySquare::selectTile(x, z + 1)) == CITY)
+	{
+		setUp(CITY);
+	}
 	if ((_j - 1) >= 0)
 	{
 		setDown((*_data)[_i][_j - 1]->tileType()); 
 		//cout << "setDown" << endl;
+	}
+	else if ((DiscoverySquare::selectTile(x, z - 1)) == CITY)
+	{
+		setDown(CITY);
 	}
 	fillUD = fillLR = (*(_tile->getGrid()));
 }
@@ -363,7 +382,7 @@ void rockTileBuilder::fillUpDown()
 
 float rockTileBuilder::random()
 {
-	float rnd = (float)-0.2 + ((rand() % 101) / (float)250.0);
+	float rnd = (float)-0.2 + ((rand() % 101) / (float)265.0);
 	//float rnd = (rand() % 101) / (float)100.0;
 	//float rnd = (-1 + rand() % 4) * 0.01f;
 	return rnd;
