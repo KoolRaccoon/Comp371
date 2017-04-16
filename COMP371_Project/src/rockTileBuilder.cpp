@@ -63,23 +63,23 @@ void rockTileBuilder::initializeGrid()
 	if ((_i - 1) >= 0)
 	{
 		setLeft((*_data)[_i - 1][_j]->tileType());
-		cout << "setLeft" << endl;
+		//cout << "setLeft" << endl;
 	}
 		
 	if ((_i + 1) < (*_data).size())
 	{
 		setRight((*_data)[_i + 1][_j]->tileType());
-		cout << "setRight" << endl;
+		//cout << "setRight" << endl;
 	}
 	if ((_j + 1) < (*_data)[_i].size())
 	{
 		setUp((*_data)[_i][_j + 1]->tileType()); 
-		cout << "setUp" << endl;
+		//cout << "setUp" << endl;
 	}
 	if ((_j - 1) >= 0)
 	{
 		setDown((*_data)[_i][_j - 1]->tileType()); 
-		cout << "setDown" << endl;
+		//cout << "setDown" << endl;
 	}
 	fillUD = fillLR = (*(_tile->getGrid()));
 }

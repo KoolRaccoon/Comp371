@@ -55,131 +55,48 @@ void cityTileBuilder::buildPosition()
 
 void cityTileBuilder::createTile()
 {
-	_tile = new tile;
+	_tile = new cityTile;
 	build();
 }
 
 void cityTileBuilder::_createBuildings(vector<GLfloat>* v)
 {
-	switch (1)
+	switch (rand()%4 + 1)
 	{
 	case 1:
-		_singleBuilding(v);
+		_singleBuilding();
 		break;
 	case 2:
-		_dualBuilding(v);
+		_dualBuilding();
 		break;
 	case 3:
-		_tripleBuilding(v);
+		_tripleBuilding();
 		break;
 	case 4:
-		_quadBuilding(v);
+		_quadBuilding();
 		break;
 	}
+	_convertToVertices(v);
 }
 
-void cityTileBuilder::_singleBuilding(vector<GLfloat> * v)
+void cityTileBuilder::_singleBuilding()
 {
-	//size of one side of the square
-	float size = (float)(rand()%4 + 4)/(float)10;
-	//center of the building
-	glm::vec3 center(0.0f, 0.0f, 0.0f);
-	//random height between 0.01 and 3.00
-	float height = (rand() % 200 + 100) / 100.0f;
+	float widthUp = randHalfSize();
+	float lengthUp = randHalfSize();
 
-	/*	top view of the calls
-	*		.---------->.
-	*		^			|
-	*		|			v
-	*start->.<----------.
-	*/
+	float centerUpx = randHalfQuad(widthUp);
+	float centerUpz = randHalfQuad(lengthUp);
 
-	//From top view, push bottom left, up and down
-	for (int i = 0; i <= 1; i++)
-	{
-		v->push_back(center.x - size / 2);
-		v->push_back(i * height);
-		v->push_back(center.z - size / 2);
-		//texture coords set to 0.0 for now.
-		v->push_back(0.0f);
-		v->push_back(0.0f);
-	}
+	float heightUp = randHeight();
 
-	//top left
-	for (int j = 0; j < 2; j++)
-	{
-		for (int i = 0; i <= 1; i++)
-		{
-			v->push_back(center.x - size / 2);
-			v->push_back(i * height);
-			v->push_back(center.z + size / 2);
-			v->push_back(0.0f);
-			v->push_back(0.0f);
-		}
-	}
-	//top right
-	for (int j = 0; j < 2; j++)
-	{
-		for (int i = 0; i <= 1; i++)
-		{
-			v->push_back(center.x + size / 2);
-			v->push_back(i * height);
-			v->push_back(center.z + size / 2);
-			v->push_back(0.0f);
-			v->push_back(0.0f);
-		}
-	}
-	//bottom right
-	for (int j = 0; j < 2; j++)
-	{
-		for (int i = 0; i <= 1; i++)
-		{
-			v->push_back(center.x + size / 2);
-			v->push_back(i * height);
-			v->push_back(center.z - size / 2);
-			v->push_back(0.0f);
-			v->push_back(0.0f);
-		}
-	}
-	//push bottom left again
-	for (int i = 0; i <= 1; i++)
-	{
-		v->push_back(center.x - size / 2);
-		v->push_back(i * height);
-		v->push_back(center.z - size / 2);
-		v->push_back(0.0f);
-		v->push_back(0.0f);
-	}
-	//push roof square
-	//top view, bottom left
-	v->push_back(center.x - size / 2);
-	v->push_back(height);
-	v->push_back(center.z - size / 2);
-	v->push_back(0.0f);
-	v->push_back(0.0f);
-	//bottom right
-	v->push_back(center.x + size / 2);
-	v->push_back(height);
-	v->push_back(center.z - size / 2);
-	v->push_back(0.0f);
-	v->push_back(0.0f);
-	//top left
-	v->push_back(center.x - size / 2);
-	v->push_back(height);
-	v->push_back(center.z + size / 2);
-	v->push_back(0.0f);
-	v->push_back(0.0f);
-	//top right
-	v->push_back(center.x + size / 2);
-	v->push_back(height);
-	v->push_back(center.z + size / 2);
-	v->push_back(0.0f);
-	v->push_back(0.0f);
+	glm::vec3 * centerUp = new glm::vec3(centerUpx, 0.0f, centerUpz);
 
+	building * b1 = new building(centerUp, heightUp, widthUp, lengthUp);
 
+	_tile->addBuilding(b1);
 }
 
-void cityTileBuilder::_dualBuilding(vector<GLfloat>* vertices)
+void cityTileBuilder::_dualBuilding()
 {
 	//size of one side of the square
 	
@@ -212,18 +129,18 @@ void cityTileBuilder::_dualBuilding(vector<GLfloat>* vertices)
 	
 }
 
-void cityTileBuilder::_tripleBuilding(vector<GLfloat>* vertices)
+void cityTileBuilder::_tripleBuilding()
 {
 	//size of one side of the square
 
 	float widthUp1 = randQuarterSize();
 	float lengthUp1 = randQuarterSize();
-		
+
 	float widthUp2 = randQuarterSize();
 	float lengthUp2 = randQuarterSize();
 
 	float widthDown = randHalfSize();
-	float lengthDown = randQuarterSize();
+	float lengthDown = -randQuarterSize();
 
 	float centerUp1x = randQuarterQuad(widthUp1, -0.5f, 0.1f);
 	float centerUp1z = randQuarterQuad(lengthUp1, 0.0f, 0.0f);
@@ -255,7 +172,8 @@ void cityTileBuilder::_tripleBuilding(vector<GLfloat>* vertices)
 	_tile->addBuilding(b3);
 }
 
-void cityTileBuilder::_quadBuilding(vector<GLfloat>* vertices)
+
+void cityTileBuilder::_quadBuilding()
 {
 	float widthUp1 = randQuarterSize();
 	float lengthUp1 = randQuarterSize();
@@ -264,10 +182,10 @@ void cityTileBuilder::_quadBuilding(vector<GLfloat>* vertices)
 	float lengthUp2 = randQuarterSize();
 
 	float widthDown1 = randQuarterSize();
-	float lengthDown1 = randQuarterSize();
+	float lengthDown1 = -randQuarterSize();
 
 	float widthDown2 = randQuarterSize();
-	float lengthDown2 = randQuarterSize();
+	float lengthDown2 = -randQuarterSize();
 
 	float centerUp1x = randQuarterQuad(widthUp1, -0.5f, 0.1f);
 	float centerUp1z = randQuarterQuad(lengthUp1, 0.0f, 0.0f);
@@ -309,8 +227,342 @@ void cityTileBuilder::_rotateBuilding(vector<glm::vec3>* b)
 {
 }
 
-void cityTileBuilder::_convertToVertices(vector<GLfloat>* v, float h)
+void cityTileBuilder::_convertToVertices(vector<GLfloat>* v)
 {
+	vector<building*> * b = _tile->getBuildings();
+	for (int i = 0; i < b->size(); i++)
+	{
+		_convertBuilding(v, (*b)[i]);
+	}
+}
+
+void cityTileBuilder::_convertBuilding(vector<GLfloat>* v, building * b)
+{
+	if(b->getCenter()->z > 0.0)
+		_convertTopHalf(v, b);
+	else
+		_convertBotHalf(v, b);
+}
+
+void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
+{
+	//size of one side of the square
+	float w = b->getWidth();
+	float h = b->getHeight();
+	float l = b->getLength();
+	//center of the building
+	glm::vec3 * c = b->getCenter();
+
+	/*	top view of the calls
+	*		.---------->.
+	*		^			|
+	*		|			v
+	*start->.<----------.
+	*	and rooftop
+	*		.			.
+	*		^\__		^
+	*		|	\__		|
+	*start->.		\-->.
+	*/
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//texture coords set to 0.0 for now.
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//texture coords set to 0.0 for now.
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+
+	v->push_back(c->x - w / 2);
+	v->push_back(0);
+	v->push_back(c->z - l / 2);
+	//texture coords set to 0.0 for now.
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+
+
+	v->push_back(c->x - w / 2);
+	v->push_back(0);
+	v->push_back(c->z - l / 2);
+	//texture coords set to 0.0 for now.
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+	//From top view, push bottom left, up and down
+	for (int i = 0; i <= 1; i++)
+	{
+		v->push_back(c->x - w / 2);
+		v->push_back(i * h);
+		v->push_back(c->z - l / 2);
+		//texture coords set to 0.0 for now.
+		v->push_back(0.0f);
+		v->push_back(0.0f);
+		//v->push_back(0.0f);
+	}
+
+	//top left
+	for (int j = 0; j < 2; j++)
+	{
+		for (int i = 0; i <= 1; i++)
+		{
+			v->push_back(c->x - w / 2);
+			v->push_back(i * h);
+			v->push_back(c->z + l / 2);
+			v->push_back(0.0f);
+			v->push_back(0.0f);
+			//v->push_back(0.0f);
+		}
+	}
+	//top right
+	for (int j = 0; j < 2; j++)
+	{
+		for (int i = 0; i <= 1; i++)
+		{
+			v->push_back(c->x + w / 2);
+			v->push_back(i * h);
+			v->push_back(c->z + l / 2);
+			v->push_back(0.0f);
+			v->push_back(0.0f);
+			//v->push_back(0.0f);
+		}
+	}
+	//bottom right
+	for (int j = 0; j < 2; j++)
+	{
+		for (int i = 0; i <= 1; i++)
+		{
+			v->push_back(c->x + w / 2);
+			v->push_back(i * h);
+			v->push_back(c->z - l / 2);
+			v->push_back(0.0f);
+			v->push_back(0.0f);
+			//v->push_back(0.0f);
+		}
+	}
+	//push bottom left again
+	for (int i = 0; i <= 1; i++)
+	{
+		v->push_back(c->x - w / 2);
+		v->push_back(i * h);
+		v->push_back(c->z - l / 2);
+		v->push_back(0.0f);
+		v->push_back(0.0f);
+		//v->push_back(0.0f);
+	}
+	//push roof square
+	//top view, bottom left
+	v->push_back(c->x - w / 2);
+	v->push_back(h);
+	v->push_back(c->z - l / 2);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+	//bottom right
+	v->push_back(c->x + w / 2);
+	v->push_back(h);
+	v->push_back(c->z - l / 2);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+	//top left
+	v->push_back(c->x - w / 2);
+	v->push_back(h);
+	v->push_back(c->z + l / 2);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+	//top right
+	v->push_back(c->x + w / 2);
+	v->push_back(h);
+	v->push_back(c->z + l / 2);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+
+
+	v->push_back(c->x);
+	v->push_back(0.0f);
+	v->push_back(c->z);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+	v->push_back(c->x);
+	v->push_back(0.0f);
+	v->push_back(c->z);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+
+}
+
+void cityTileBuilder::_convertBotHalf(vector<GLfloat>* v, building * b)
+{
+	//size of one side of the square
+	float w = b->getWidth();
+	float h = b->getHeight();
+	float l = b->getLength();
+	//center of the building
+	glm::vec3 * c = b->getCenter();
+
+	/*	top view of the calls
+	*		.---------->.
+	*		^			|
+	*		|			v
+	*start->.<----------.
+	*	and rooftop
+	*		.			.
+	*		^\__		^
+	*		|	\__		|
+	*start->.		\-->.
+	*/
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//texture coords set to 0.0 for now.
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+
+
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//texture coords set to 0.0 for now.
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+
+	v->push_back(c->x - w / 2);
+	v->push_back(0);
+	v->push_back(c->z - l / 2);
+	//texture coords set to 0.0 for now.
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+
+
+	v->push_back(c->x - w / 2);
+	v->push_back(0);
+	v->push_back(c->z - l / 2);
+	//texture coords set to 0.0 for now.
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+
+	//Top right
+	for (int i = 0; i <= 1; i++)
+	{
+		v->push_back(c->x + w / 2);
+		v->push_back(i * h);
+		v->push_back(c->z + l / 2);
+		v->push_back(0.0f);
+		v->push_back(0.0f);
+		//v->push_back(0.0f);
+	}
+	//bottom right
+	for (int j = 0; j < 2; j++)
+	{
+		for (int i = 0; i <= 1; i++)
+		{
+			v->push_back(c->x + w / 2);
+			v->push_back(i * h);
+			v->push_back(c->z - l / 2);
+			v->push_back(0.0f);
+			v->push_back(0.0f);
+			//v->push_back(0.0f);
+		}
+	}
+	//bottom left
+	for (int j = 0; j < 2; j++)
+	{
+		for (int i = 0; i <= 1; i++)
+		{
+			v->push_back(c->x - w / 2);
+			v->push_back(i * h);
+			v->push_back(c->z - l / 2);
+			//texture coords set to 0.0 for now.
+			v->push_back(0.0f);
+			v->push_back(0.0f);
+			//v->push_back(0.0f);
+		}
+	}
+	//top left
+	for (int j = 0; j < 2; j++)
+	{
+		for (int i = 0; i <= 1; i++)
+		{
+			v->push_back(c->x - w / 2);
+			v->push_back(i * h);
+			v->push_back(c->z + l / 2);
+			v->push_back(0.0f);
+			v->push_back(0.0f);
+			//v->push_back(0.0f);
+		}
+	}
+	
+	
+	//push top right again
+	for (int i = 0; i <= 1; i++)
+	{
+		v->push_back(c->x + w / 2);
+		v->push_back(i * h);
+		v->push_back(c->z + l / 2);
+		v->push_back(0.0f);
+		v->push_back(0.0f);
+		//v->push_back(0.0f);
+	}
+	//push roof square
+	//top view,
+	//top right
+	v->push_back(c->x + w / 2);
+	v->push_back(h);
+	v->push_back(c->z + l / 2);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+	
+	//bottom right
+	v->push_back(c->x + w / 2);
+	v->push_back(h);
+	v->push_back(c->z - l / 2);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+
+	//top left
+	v->push_back(c->x - w / 2);
+	v->push_back(h);
+	v->push_back(c->z + l / 2);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+
+	//bottom left
+	v->push_back(c->x - w / 2);
+	v->push_back(h);
+	v->push_back(c->z - l / 2);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+	
+	v->push_back(c->x);
+	v->push_back(0.0f);
+	v->push_back(c->z);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+	v->push_back(c->x);
+	v->push_back(0.0f);
+	v->push_back(c->z);
+	v->push_back(0.0f);
+	v->push_back(0.0f);
+	//v->push_back(0.0f);
+
 }
 
 float cityTileBuilder::randHeight()
@@ -330,8 +582,11 @@ float cityTileBuilder::randHalfSize()
 
 float cityTileBuilder::randQuarterQuad(float val, float init, float offset)
 {
-	return init + offset + val / 2 +
-		(float)(rand() % (int)((0.5f - 0.1f - val) * 10)) / (float)10;
+	float r = (0.5f - 0.1f - val) * 10;
+	int range = (int)round(r);
+	int value = (rand() % range);
+	float rdm = (float)val / (float)10;
+	return init + offset + val / 2 + rdm;	
 }
 
 float cityTileBuilder::randHalfQuad(float val)

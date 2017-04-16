@@ -26,6 +26,7 @@ public:
 	float getHeight() { return _height; }
 	float getWidth() { return _width; }
 	float getLength() { return _length; }
+	glm::vec3 * getCenter() { return _center; }
 
 	//Checks if the position(in tile coords) is inside the building
 	bool checkIfInside(glm::vec3 * pos)

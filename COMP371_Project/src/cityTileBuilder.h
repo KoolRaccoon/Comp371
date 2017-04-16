@@ -1,6 +1,8 @@
 #pragma once
 #include "stdafx.h"
 #include "tileBuilder.h"
+#include "cityTile.h"
+
 class cityTileBuilder : public tileBuilder
 {
 public:
@@ -18,15 +20,19 @@ public:
 	virtual void createTile();
 private:
 	void _createBuildings(vector<GLfloat> * vertices);
-	void _singleBuilding(vector<GLfloat> * vertices);
-	void _dualBuilding(vector<GLfloat> * vertices);
-	void _tripleBuilding(vector<GLfloat> * vertices);
-	void _quadBuilding(vector<GLfloat> * vertices);
+	void _singleBuilding();
+	void _dualBuilding();
+	void _tripleBuilding();
+	void _quadBuilding();
 	void _rotateBuilding(vector<glm::vec3> * building);
-	void _convertToVertices(vector<GLfloat> * vertices, float height);
+	void _convertToVertices(vector<GLfloat> * vertices);
+	void _convertBuilding(vector<GLfloat> * vertices, building * building);
+	void _convertTopHalf(vector<GLfloat> * vertices, building * building);
+	void _convertBotHalf(vector<GLfloat> * vertices, building * building);
 	float randHeight();
 	float randQuarterSize();
 	float randHalfSize();
 	float randQuarterQuad(float value, float smallestPosition, float offset);
 	float randHalfQuad(float val);
+	
 };

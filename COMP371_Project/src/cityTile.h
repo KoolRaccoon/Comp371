@@ -6,7 +6,11 @@
 class cityTile : public tile
 {
 public:
-	cityTile() :tile() { this->setTileType(CITY); }
+	cityTile() :tile() 
+	{ 
+		this->setTileType(CITY); 
+		_buildings = new vector<building*>;
+	}
 	~cityTile()
 	{
 		delete _buildings;

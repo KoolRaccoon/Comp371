@@ -82,11 +82,10 @@ void DiscoverySquare::createTiles(int x, int z)
 			{
 				count++;
 				glm::vec3 * pos = new glm::vec3(i + x, 0.0f, j + z);
-				//tileBuilder * rtb = new rockTileBuilder(shaders[ROCK], pos, usedData, i, j);
-				if ((i + x) <= 25 && 
-					(i + x) >= -25 &&
-					(j + z) <= 25 &&
-					(j + z) >= -25)
+				unsigned int type = selectTile(i + x, j + z);
+				switch (type)
+				{
+				case 1:
 				{
 					tileBuilder * ctb = new cityTileBuilder(shaders[CITY], pos);
 					ctb->createTile();
@@ -94,8 +93,9 @@ void DiscoverySquare::createTiles(int x, int z)
 					data.push_back(ctb->getTile());
 					delete ctb;
 					ctb = nullptr;
+					break;
 				}
-				else
+				case 2:
 				{
 					tileBuilder * rtb = new rockTileBuilder(shaders[ROCK], pos, usedData, i, j);
 					rtb->createTile();
@@ -104,10 +104,22 @@ void DiscoverySquare::createTiles(int x, int z)
 					delete rtb;
 					rtb = nullptr;
 					//cout << "Creating rock tile" << endl;
+					break;
+				}
 				}
 			}
 		}
 	}
+}
+unsigned int DiscoverySquare::selectTile(int x, int z)
+{
+	if ((x) <= 25 &&
+		(x) >= -25 &&
+		(z) <= 25 &&
+		(z) >= -25)
+		return (CITY);
+	else
+		return (ROCK);
 }
 void DiscoverySquare::addShader(Shader * s)
 {
