@@ -26,13 +26,16 @@ public:
 	void addShader(Shader * shader);
 	//Creates the initial used data. 
 	void initializeUsedData();
+	glm::vec3 checkCollision(glm::vec3 currentCameraPos, glm::vec3 nextCameraPosistion);
 	static unsigned int selectTile(int worldx, int worldz);
+
 
 private:
 	
 	//Creates tiles for each tile of type EMPTY in usedData
 	void createTiles(int smallestX, int smallestZ);
-	
+	glm::vec3 toTileCoord(glm::vec3 worldPosition, glm::vec3 * tilePosition);
+	tile * findTile(glm::vec3 nextCameraPosition);
 
 	float xSize;
 	float zSize;

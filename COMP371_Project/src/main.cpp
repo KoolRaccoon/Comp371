@@ -19,7 +19,7 @@ void do_movement();
 const GLuint WIDTH = 800, HEIGHT = 600;
 
 // Camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraPos = glm::vec3(0.5f, 1.0f, 0.5f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 GLfloat yaw = -90.0f;	// Yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right (due to how Eular angles work) so we initially rotate a bit to the left.
@@ -29,8 +29,8 @@ GLfloat lastY = HEIGHT / 2.0;
 GLfloat fov = 45.0f;
 //Discovery Square
 //Initial square size of sizeX * sizeZ HAS TO BE AN EVEN NUMBER
-float sizeX = 24;
-float sizeZ = 24;
+float sizeX = 40;
+float sizeZ = 40;
 //Creates a square around the camera's initial position
 DiscoverySquare DS(sizeX, sizeZ, cameraPos);
 
@@ -74,10 +74,11 @@ int main()
 	// Define the viewport dimensions
 	glViewport(0, 0, WIDTH, HEIGHT);
 
+	GLfloat fogColor[4] = { 0.5, 0.5, 0.5, 1.0 };
+	//GLfloat fcamPos[3] = { cameraPos.x, cameraPos.y, cameraPos.z };
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);
 	//glFrontFace(GL_CCW);
-
 
 	// Build and compile our shader program
 	Shader * defaultShader = new Shader("vertex.shader", "default.shader");
@@ -168,7 +169,7 @@ int main()
 
 		// Render
 		// Clear the colorbuffer
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -246,25 +247,25 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void do_movement()
 {
 	// Camera controls with tiles update on movement
-	GLfloat cameraSpeed = 5.0f * deltaTime;
+	GLfloat cameraSpeed = 2.0f * deltaTime;
 	if (keys[GLFW_KEY_W])
 	{
-		cameraPos += cameraSpeed * cameraFront;
+		cameraPos = DS.checkCollision(cameraPos, cameraPos + cameraSpeed * cameraFront);
 		tiles = DS.update(cameraPos);
 	}
 	if (keys[GLFW_KEY_S])
 	{
-		cameraPos -= cameraSpeed * cameraFront;
+		cameraPos = DS.checkCollision(cameraPos, cameraPos - cameraSpeed * cameraFront);
 		tiles = DS.update(cameraPos);
 	}
 	if (keys[GLFW_KEY_A])
 	{
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		cameraPos = DS.checkCollision(cameraPos, cameraPos - glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed);
 		tiles = DS.update(cameraPos);
 	}
 	if (keys[GLFW_KEY_D])
 	{
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		cameraPos = DS.checkCollision(cameraPos, cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed);
 		tiles = DS.update(cameraPos);
 	}
 	if (keys[GLFW_KEY_SPACE])

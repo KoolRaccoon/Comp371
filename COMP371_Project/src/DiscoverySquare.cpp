@@ -65,6 +65,37 @@ void DiscoverySquare::initializeUsedData()
 	}
 }
 
+glm::vec3 DiscoverySquare::checkCollision(glm::vec3 currentPos, glm::vec3 nextPos)
+{
+	tile * t = findTile(nextPos);
+
+	bool goodx = false;
+	bool goody = false;
+	bool goodz = false;
+
+	glm::vec3 movex = glm::vec3(nextPos.x, currentPos.y, currentPos.z);
+	glm::vec3 movey = glm::vec3(currentPos.x, nextPos.y, currentPos.z);
+	glm::vec3 movez = glm::vec3(currentPos.x, currentPos.y, nextPos.z);
+
+	glm::vec3 tilex = toTileCoord(movex, t->getPosition());
+	glm::vec3 tiley = toTileCoord(movey, t->getPosition());
+	glm::vec3 tilez = toTileCoord(movez, t->getPosition());
+
+	float distx = nextPos.x - currentPos.x;
+	float disty = nextPos.y - currentPos.y;
+	float distz = nextPos.z - currentPos.z;
+
+	goodx = t->checkCollision(&tilex);
+	goody = t->checkCollision(&tiley);
+	goodz = t->checkCollision(&tilez);
+
+	glm::vec3 realPos = glm::vec3
+	(!goodx * distx + currentPos.x,
+		!goody * disty + currentPos.y,
+		!goodz * distz + currentPos.z);
+	return realPos;
+}
+
 vector<vector<tile*>> * DiscoverySquare::initializeSquare()
 {
 	createTiles(-(xSize / 2), -(zSize / 2));
@@ -110,6 +141,19 @@ void DiscoverySquare::createTiles(int x, int z)
 			}
 		}
 	}
+}
+glm::vec3 DiscoverySquare::toTileCoord(glm::vec3 wp, glm::vec3 * tp)
+{
+	return glm::vec3(wp.x-tp->x, wp.y-tp->y, wp.z-tp->z);
+}
+tile * DiscoverySquare::findTile(glm::vec3 nextCameraPosition)
+{
+	
+	for (int i = 0; i < (*usedData).size(); i++)
+		for (int j = 0; j < (*usedData)[i].size(); j++)
+			if ((*usedData)[i][j]->getPosition()->x == roundf(nextCameraPosition.x) &&
+				(*usedData)[i][j]->getPosition()->z == roundf(nextCameraPosition.z))
+				return (*usedData)[i][j];
 }
 unsigned int DiscoverySquare::selectTile(int x, int z)
 {

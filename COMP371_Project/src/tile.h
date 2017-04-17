@@ -29,6 +29,7 @@ public:
 	Shader * getShader();
 	//Returns a pointer to the position of the tile, you can also use x and z
 	glm::vec3 * getPosition();
+	virtual bool checkCollision(glm::vec3 * position) { return false; }
 	virtual vector<vector<GLfloat>> * getGrid() { return nullptr; };
 	virtual vector<building*> * getBuildings() { return nullptr; };
 

@@ -31,11 +31,22 @@ public:
 	//Checks if the position(in tile coords) is inside the building
 	bool checkIfInside(glm::vec3 * pos)
 	{
-		if (pos->y <= _height &&
-			pos->x <= _center->x + _width / 2 &&
-			pos->x >= _center->x - _width / 2 &&
-			pos->z <= _center->z + _length / 2 &&
-			pos->z >= _center->z + _length / 2)
+		bool collh = false;
+		bool collx = false;
+		bool collz = false;
+		if (pos->y <= _height)
+			collh = true;
+		if (pos->x <= _center->x + _width / 2 &&
+			pos->x >= _center->x - _width / 2)
+			collx = true;
+		if (pos->z <= _center->z + _length / 2 &&
+			pos->z >= _center->z - _length / 2)
+			collz = true;
+		if (pos->y <= (_height + 0.18f) &&
+			pos->x <= (_center->x + _width / 2 + 0.18f) &&
+			pos->x >= (_center->x - _width / 2 - 0.18f) &&
+			pos->z <= (_center->z + _length / 2 + 0.18f) &&
+			pos->z >= (_center->z - _length / 2 - 0.18f))
 			return true;
 		else
 			return false;
