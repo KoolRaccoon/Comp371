@@ -25,7 +25,7 @@ public:
 			(*_grid)[posx2][posz1] +
 			(*_grid)[posx2][posz2];
 		avgH = avgH / 4;
-		if (avgH < position->z)
+		if ((avgH + 0.8f) > position->y)
 			return true;
 		else
 			return false;	

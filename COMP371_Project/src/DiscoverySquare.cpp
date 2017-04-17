@@ -89,6 +89,9 @@ glm::vec3 DiscoverySquare::checkCollision(glm::vec3 currentPos, glm::vec3 nextPo
 	goody = t->checkCollision(&tiley);
 	goodz = t->checkCollision(&tilez);
 
+	if ((goodx || goodz) && t->tileType() == ROCK)
+		currentPos.y += 0.05f;
+
 	glm::vec3 realPos = glm::vec3
 	(!goodx * distx + currentPos.x,
 		!goody * disty + currentPos.y,

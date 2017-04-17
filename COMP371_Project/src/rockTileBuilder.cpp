@@ -68,7 +68,7 @@ void rockTileBuilder::initializeGrid()
 		setLeft((*_data)[_i - 1][_j]->tileType());
 		//cout << "setLeft" << endl;
 	}
-	else if((DiscoverySquare::selectTile(x - 1, z)) == CITY)
+ 	else if((DiscoverySquare::selectTile(x - 1, z)) == CITY)
 	{
 		setLeft(CITY);
 	}
