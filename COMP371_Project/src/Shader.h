@@ -6,7 +6,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "..\glew\glew.h"	// include GL Extension Wrangler
+#include "../glew/glew.h"	// include GL Extension Wrangler
 
 class Shader
 {

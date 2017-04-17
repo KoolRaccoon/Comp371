@@ -1,11 +1,3 @@
-//============================================================================
-// Name        : COMP371_Project.cpp
-// Author      : Felix Lucaciu, Keven Presseau-St-Laurent
-// Version     :1.0
-// Copyright   : Your copyright notice
-// Description : Procedurally generated city
-//============================================================================
-
 ///Lab 2
 //modified from http://learnopengl.com/
 
@@ -27,12 +19,17 @@
 #include "Shader.h"
 #include "DiscoverySquare.h"
 #include "../soil/src/SOIL.h"
+#include "stdafx.h"
+#include "Shader.h"
+#include "DiscoverySquare.h"
+#include "tile.h"
+
 
 using namespace std;
 
 // Function prototypes
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
-//void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void do_movement();
 
@@ -40,7 +37,7 @@ void do_movement();
 const GLuint WIDTH = 800, HEIGHT = 600;
 
 // Camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraPos = glm::vec3(0.5f, 1.0f, 0.5f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 GLfloat yaw = -90.0f;	// Yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right (due to how Eular angles work) so we initially rotate a bit to the left.
@@ -49,10 +46,13 @@ GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 GLfloat fov = 45.0f;
 //Discovery Square
-vector<glm::vec3> tilePositions;
-float sizeX = 50;
-float sizeZ = 50;
-DiscoverySquare DS(-sizeX, sizeX, -sizeZ, sizeZ);
+//Initial square size of sizeX * sizeZ HAS TO BE AN EVEN NUMBER
+float sizeX = 40;
+float sizeZ = 40;
+//Creates a square around the camera's initial position
+DiscoverySquare DS(sizeX, sizeZ, cameraPos);
+
+vector<vector<tile*>> * tiles;
 bool keys[1024];
 
 // Deltatime
@@ -63,12 +63,14 @@ GLfloat lastFrame = 0.0f;  	// Time of last frame
 							// The MAIN function, from here we start the application and run the game loop
 int main()
 {
+	srand (time(NULL));
 	// Init GLFW
 	glfwInit(); 
 	// Set all the required options for GLFW
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //Only needed for Mac Compiler.
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
 	// Create a GLFWwindow object that we can use for GLFW's functions
@@ -77,11 +79,11 @@ int main()
 
 	// Set the required callback functions
 	glfwSetKeyCallback(window, key_callback);
-	//glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
 	// GLFW Options
-	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Set this to true so GLEW knows to use a modern approach to retrieving function pointers and extensions
 	glewExperimental = GL_TRUE;
@@ -91,37 +93,25 @@ int main()
 	// Define the viewport dimensions
 	glViewport(0, 0, WIDTH, HEIGHT);
 
+	GLfloat fogColor[4] = { 0.5, 0.5, 0.5, 1.0 };
+	//GLfloat fcamPos[3] = { cameraPos.x, cameraPos.y, cameraPos.z };
 	glEnable(GL_DEPTH_TEST);
-
+	//glEnable(GL_CULL_FACE);
+	//glFrontFace(GL_CCW);
 
 	// Build and compile our shader program
-	Shader ourShader("vertex.shader", "fragment.shader");
+	Shader * defaultShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/default.shader");
+	Shader * cityTileShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/cityTile.shader");
+	Shader * rockTileShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/rockTile.shader");
+	/*Adds the shaders to the discovery square. 
+	* Pls use the order from the tile.h const declarations*/
+	DS.addShader(defaultShader);
+	DS.addShader(cityTileShader);
+	DS.addShader(rockTileShader);
 
-
-	// Set up vertex data (and buffer(s)) and attribute pointers
-	GLfloat vertices[] = {
-		//Square
-		//Bottom triangle
-		// Positions          //Temporary Texture Coords
-		0.5f,   0.0f,  0.5f,   1.0f, 1.0f,   // Top Right
-		0.5f,  0.0f,   -0.5f,  1.0f, 0.0f,   // Bottom Right
-		-0.5f,   0.0f, 0.5f,   0.0f, 1.0f,    // Top Left 
-
-		//Top triangle
-		0.5f,  0.0f, -0.5f,    1.0f, 0.0f,   // Bottom Right
-		-0.5f,  0.0f, -0.5f,   0.0f, 0.0f,   // Bottom Left
-		-0.5f,   0.0f, 0.5f,    0.0f, 1.0f    // Top Left
-
-	};
+	//Initializes the starting discovered square 
+	tiles = DS.initializeSquare();
 	
-	//Initial tile square
-	for (int i = 0; i < (int)sizeX*2; i++)
-		for (int j = 0; j < (int)sizeZ*2; j++)
-			tilePositions.push_back(glm::vec3(i - sizeX, 0.0f, j - sizeZ));
-	
-
-
-
 
 	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
@@ -130,7 +120,9 @@ int main()
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	//Sets an empty VBO able to contain 500 points 
+	/***** Can be changed later if necessary *****/
+	glBufferData(GL_ARRAY_BUFFER, 1500 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
 
 	// Position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
@@ -196,44 +188,53 @@ int main()
 
 		// Render
 		// Clear the colorbuffer
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-		// Bind Textures using texture units
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
-		glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture1"), 0);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
-		glUniform1i(glGetUniformLocation(ourShader.Program, "ourTexture2"), 1);
+		
 
-		// Activate shader
-		ourShader.Use();
-
-		// Camera/View transformation
-		glm::mat4 view;
-		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-		// Projection 
-		glm::mat4 projection;
-		projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
-		// Get the uniform locations
-		GLint modelLoc = glGetUniformLocation(ourShader.Program, "model");
-		GLint viewLoc = glGetUniformLocation(ourShader.Program, "view");
-		GLint projLoc = glGetUniformLocation(ourShader.Program, "projection");
-		// Pass the matrices to the shader
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		glBindVertexArray(VAO);
-		for (GLuint i = 0; i < tilePositions.size() ; i++)
+		for (GLuint i = 0; i < tiles->size() ; i++)
 		{
-			// Calculate the model matrix for each object and pass it to shader before drawing
-			glm::mat4 model;
-			model = glm::translate(model, tilePositions[i]);
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			for (GLuint j = 0; j < (*tiles)[i].size(); j++)
+			{
+				// Select the right shader to use
+				Shader * ourShader = (*tiles)[i][j]->getShader();
+				ourShader->Use();
 
-			glDrawArrays(GL_TRIANGLES, 0, 6);
+				//Gets the vertices of the tile to draw
+				glBufferSubData(GL_ARRAY_BUFFER, 0, (*tiles)[i][j]->getVertices()->size() * sizeof(GLfloat), &(*tiles)[i][j]->getVertices()->front());
+				
+				// Camera/View transformation
+				glm::mat4 view;
+				//Standard view matrix from a lookAt method
+				view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+				// Projection 
+				glm::mat4 projection;
+				projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+				// Get the uniform locations
+				GLint modelLoc = glGetUniformLocation(ourShader->Program, "model");
+				GLint viewLoc = glGetUniformLocation(ourShader->Program, "view");
+				GLint projLoc = glGetUniformLocation(ourShader->Program, "projection");
+				// Pass the matrices to the shader
+				glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+				glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+				// Calculate the model matrix for each object and pass it to shader before drawing
+				glm::mat4 model;
+				
+				//Translates the whole tile to its position
+				model = glm::translate(model, *(*tiles)[i][j]->getPosition());
+				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+				//Draws the arrays from the tile's options
+				/*****This needs to be changed to get dynamic values instead of 0, 6			******
+				***** or we will need to implement more than one draw for more than one object	*******
+				***** per tile, if so we will need to allow more than one shader per tile or	*******
+				***** create complex shaders													*******/
+				glDrawArrays((*tiles)[i][j]->drawType(), 0, (*tiles)[i][j]->getVertices()->size()/5);
+			}
 		}
 		glBindVertexArray(0);
 
@@ -264,29 +265,38 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 void do_movement()
 {
-	// Camera controls
-	GLfloat cameraSpeed = 5.0f * deltaTime;
+	// Camera controls with tiles update on movement
+	GLfloat cameraSpeed = 2.0f * deltaTime;
 	if (keys[GLFW_KEY_W])
-		cameraPos += cameraSpeed * cameraFront;
-	if (keys[GLFW_KEY_S])
-		cameraPos -= cameraSpeed * cameraFront;
-	if (keys[GLFW_KEY_A])
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-	if (keys[GLFW_KEY_D])
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-	//Checks if the camera has moved outside the boundary
-	if (DS.needUpdate(cameraPos))
 	{
-		vector<glm::vec3> v = DS.getTransl(cameraPos);
-		for (int i = 0; i < v.size(); i++)
-		{
-			tilePositions.push_back(v[i]);
-		}
+		cameraPos = DS.checkCollision(cameraPos, cameraPos + cameraSpeed * cameraFront);
+		tiles = DS.update(cameraPos);
 	}
+	if (keys[GLFW_KEY_S])
+	{
+		cameraPos = DS.checkCollision(cameraPos, cameraPos - cameraSpeed * cameraFront);
+		tiles = DS.update(cameraPos);
+	}
+	if (keys[GLFW_KEY_A])
+	{
+		cameraPos = DS.checkCollision(cameraPos, cameraPos - glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed);
+		tiles = DS.update(cameraPos);
+	}
+	if (keys[GLFW_KEY_D])
+	{
+		cameraPos = DS.checkCollision(cameraPos, cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed);
+		tiles = DS.update(cameraPos);
+	}
+	if (keys[GLFW_KEY_SPACE])
+	{
+		cameraPos += glm::vec3(0.0f, cameraSpeed, 0.0f);
+	}
+	//Checks if the camera has moved outside the boundary
+	
 
 }
 
-/*bool firstMouse = true;
+bool firstMouse = true;
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	if (firstMouse)
@@ -319,7 +329,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	front.y = sin(glm::radians(pitch));
 	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 	cameraFront = glm::normalize(front);
-}*/
+}
+
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
@@ -330,6 +341,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	if (fov >= 45.0f)
 		fov = 45.0f;
 }
+
+//Handles window resize
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
