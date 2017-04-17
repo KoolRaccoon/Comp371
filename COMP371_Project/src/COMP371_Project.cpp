@@ -13,20 +13,20 @@
 #include <cmath>
 
 
-#include "..\glew\glew.h"	// include GL Extension Wrangler
-#include "..\glfw\glfw3.h"	// include GLFW helper library
+#include "../glew/glew.h"	// include GL Extension Wrangler
+#include "../glfw/glfw3.h"	// include GLFW helper library
 #include <stdio.h>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <sstream>
-#include "..\glm/glm.hpp"
-#include "..\glm/gtc/matrix_transform.hpp"
-#include "..\glm/gtc/type_ptr.hpp"
+#include "../glm/glm.hpp"
+#include "../glm/gtc/matrix_transform.hpp"
+#include "../glm/gtc/type_ptr.hpp"
 #include "Shader.h"
 #include "DiscoverySquare.h"
-#include <SOIL.h>
+#include "../soil/src/SOIL.h"
 
 using namespace std;
 
@@ -64,7 +64,7 @@ GLfloat lastFrame = 0.0f;  	// Time of last frame
 int main()
 {
 	// Init GLFW
-	glfwInit();
+	glfwInit(); 
 	// Set all the required options for GLFW
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);

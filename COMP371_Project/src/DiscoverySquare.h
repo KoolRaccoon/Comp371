@@ -1,7 +1,7 @@
 #pragma once
-#include "..\glm/glm.hpp"
-#include "..\glm/gtc/matrix_transform.hpp"
-#include "..\glm/gtc/type_ptr.hpp"
+#include "../glm/glm.hpp"
+#include "../glm/gtc/matrix_transform.hpp"
+#include "../glm/gtc/type_ptr.hpp"
 #include <vector>
 
 //Class used to send a boundary of discovery to load new tiles
