@@ -115,27 +115,6 @@ int main()
 	//Initializes the starting discovered square 
 	tiles = DS.initializeSquare();
 	
-
-	GLuint VBO, VAO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//Sets an empty VBO able to contain 500 points 
-	/***** Can be changed later if necessary *****/
-	glBufferData(GL_ARRAY_BUFFER, 1500 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
-
-	// Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-	// TexCoord attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
-
-	glBindVertexArray(0); // Unbind VAO
-
     //SKYBOX GENERATION
     
     
@@ -207,6 +186,28 @@ int main()
     
     // END SKYBOX
 
+
+	GLuint VBO, VAO;
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+
+	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//Sets an empty VBO able to contain 500 points 
+	/***** Can be changed later if necessary *****/
+	glBufferData(GL_ARRAY_BUFFER, 1500 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+
+	// Position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	// TexCoord attribute
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+
+	glBindVertexArray(0); // Unbind VAO
+
+
 						  // Load and create a texture 
 	GLuint texture1;
 	GLuint texture2;
@@ -264,9 +265,6 @@ int main()
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 view;
-        glm::mat4 projection = glm::perspective( 45.0f, ( float )WIDTH/( float )HEIGHT, 0.1f, 1000.0f );
-
 		glBindVertexArray(VAO);
 		for (GLuint i = 0; i < tiles->size() ; i++)
 		{
@@ -310,6 +308,8 @@ int main()
 		}
 		glBindVertexArray(0);
 
+        glm::mat4 view;
+        glm::mat4 projection = glm::perspective( 45.0f, ( float )WIDTH/( float )HEIGHT, 0.1f, 1000.0f );
         
         // Draw skybox as last
         glDepthFunc( GL_LEQUAL );  // Change depth function so depth test passes when values are equal to depth buffer's content
