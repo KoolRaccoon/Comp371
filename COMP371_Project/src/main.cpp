@@ -62,11 +62,22 @@ GLfloat lastFrame = 0.0f;  	// Time of last frame
 
 							// The MAIN function, from here we start the application and run the game loop
 							// The MAIN function, from here we start the application and run the game loop
+//*****FOG*****
+bool   gp = false;                      // G Pressed? ( New )
+GLuint filter;                      // Which Filter To Use
+GLuint fogMode[]= { GL_EXP, GL_EXP2, GL_LINEAR };   // Storage For Three Types Of Fog
+GLuint fogfilter= 2;                    // Which Fog To Use
+GLfloat fogColor[4]= {0.5f, 0.5f, 0.5f, 1.0f};      // Fog Color
+void Fog_Init();
+//*****FOG*****
+
+
 int main()
 {
 	srand (time(NULL));
 	// Init GLFW
-	glfwInit(); 
+	glfwInit();
+    
 	// Set all the required options for GLFW
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -90,11 +101,11 @@ int main()
 	glewExperimental = GL_TRUE;
 	// Initialize GLEW to setup the OpenGL Function pointers
 	glewInit();
-
+    Fog_Init();
 	// Define the viewport dimensions
 	glViewport(0, 0, WIDTH, HEIGHT);
 
-	GLfloat fogColor[4] = { 0.5, 0.5, 0.5, 1.0 };
+	//GLfloat fogColor[4] = { 0.5, 0.5, 0.5, 1.0 };
 	//GLfloat fcamPos[3] = { cameraPos.x, cameraPos.y, cameraPos.z };
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);
@@ -350,6 +361,19 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		else if (action == GLFW_RELEASE)
 			keys[key] = false;
 	}
+    //*****FOG KEYS*****
+    if (key == GLFW_KEY_G && action == GLFW_PRESS)
+    {
+        gp=true;
+        fogfilter+=1;
+        if (fogfilter>2)
+            fogfilter=0;
+        glFogi(GL_FOG_MODE, fogMode[fogfilter]);
+    }
+    
+    if (key == GLFW_KEY_O && action == GLFW_PRESS)
+        gp=false;
+    //*****FOG KEYS*****
 }
 
 void do_movement()
@@ -381,7 +405,6 @@ void do_movement()
 		cameraPos += glm::vec3(0.0f, cameraSpeed, 0.0f);
 	}
 	//Checks if the camera has moved outside the boundary
-	
 
 }
 
@@ -429,6 +452,17 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 		fov = 1.0f;
 	if (fov >= 45.0f)
 		fov = 45.0f;
+}
+
+void Fog_Init () {
+    glClearColor(0.5f,0.5f,0.5f,1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
+    glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
+    glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
+    glFogf(GL_FOG_DENSITY, 0.35f);              // How Dense Will The Fog Be
+    glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
+    glFogf(GL_FOG_START, 1.0f);             // Fog Start Depth
+    glFogf(GL_FOG_END, 5.0f);               // Fog End Depth
+    glEnable(GL_FOG);                   // Enables GL_FOG
 }
 
 //Handles window resize
