@@ -18,11 +18,12 @@
 #include "../glm/gtc/type_ptr.hpp"
 #include "Shader.h"
 #include "DiscoverySquare.h"
-#include "../soil/src/SOIL.h"
+#include "../SOIL2/SOIL2.h"
 #include "stdafx.h"
 #include "Shader.h"
 #include "DiscoverySquare.h"
 #include "tile.h"
+#include "texture.h"
 
 
 using namespace std;
@@ -103,12 +104,14 @@ int main()
 	Shader * defaultShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/default.shader");
 	Shader * cityTileShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/cityTile.shader");
 	Shader * rockTileShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/rockTile.shader");
+     Shader skyboxShader( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/sbvtx.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/sbfr.shader" );
+    
 	/*Adds the shaders to the discovery square. 
 	* Pls use the order from the tile.h const declarations*/
 	DS.addShader(defaultShader);
 	DS.addShader(cityTileShader);
 	DS.addShader(rockTileShader);
-
+    
 	//Initializes the starting discovered square 
 	tiles = DS.initializeSquare();
 	
@@ -133,6 +136,76 @@ int main()
 
 	glBindVertexArray(0); // Unbind VAO
 
+    //SKYBOX GENERATION
+    
+    
+    GLfloat skyboxVertices[] = {
+        // Positions
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+        
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+        
+        -1.0f,  1.0f, -1.0f,
+        1.0f,  1.0f, -1.0f,
+        1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+        
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+        1.0f, -1.0f,  1.0f
+    };
+    
+    // Setup skybox VAO
+    GLuint skyboxVAO, skyboxVBO;
+    glGenVertexArrays( 1, &skyboxVAO );
+    glGenBuffers( 1, &skyboxVBO );
+    glBindVertexArray( skyboxVAO );
+    glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( skyboxVertices ), &skyboxVertices, GL_STATIC_DRAW );
+    glEnableVertexAttribArray( 0 );
+    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
+    glBindVertexArray(0);
+    
+    // Cubemap (Skybox)
+    vector<const GLchar*> faces;
+    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_rt.tga" );
+    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_lf.tga" );
+    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_up.tga" );
+    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_dn.tga" );
+    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_bk.tga" );
+    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_ft.tga" );
+    GLuint cubemapTexture = TextureLoading::LoadCubemap( faces );
+    
+    // END SKYBOX
 
 						  // Load and create a texture 
 	GLuint texture1;
@@ -191,9 +264,8 @@ int main()
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-		
-
+        glm::mat4 view;
+        glm::mat4 projection = glm::perspective( 45.0f, ( float )WIDTH/( float )HEIGHT, 0.1f, 1000.0f );
 
 		glBindVertexArray(VAO);
 		for (GLuint i = 0; i < tiles->size() ; i++)
@@ -238,6 +310,23 @@ int main()
 		}
 		glBindVertexArray(0);
 
+        
+        // Draw skybox as last
+        glDepthFunc( GL_LEQUAL );  // Change depth function so depth test passes when values are equal to depth buffer's content
+        skyboxShader.Use( );
+        
+        view = glm::mat4( glm::mat3( glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp) ) );	// Remove any translation component of the view matrix
+        
+        glUniformMatrix4fv( glGetUniformLocation( skyboxShader.Program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
+        
+        glUniformMatrix4fv( glGetUniformLocation( skyboxShader.Program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
+        
+        // skybox cube
+        glBindVertexArray( skyboxVAO );
+        glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTexture );
+        glDrawArrays( GL_TRIANGLES, 0, 36 );
+        glBindVertexArray( 0 );
+        glDepthFunc( GL_LESS ); // Set depth function back to default
 		// Swap the screen buffers
 		glfwSwapBuffers(window);
 	}
