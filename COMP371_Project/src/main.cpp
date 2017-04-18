@@ -18,7 +18,7 @@
 #include "../glm/gtc/type_ptr.hpp"
 #include "Shader.h"
 #include "DiscoverySquare.h"
-#include "SOIL2.h"
+#include "../SOIL2/SOIL2.h"
 #include "stdafx.h"
 #include "Shader.h"
 #include "DiscoverySquare.h"
@@ -112,10 +112,10 @@ int main()
 	//glFrontFace(GL_CCW);
 
 	// Build and compile our shader program
-	Shader * defaultShader = new Shader("vertex.shader", "default.shader");
-	Shader * cityTileShader = new Shader("vertex.shader", "cityTile.shader");
-	Shader * rockTileShader = new Shader("vertex.shader", "rockTile.shader");
-     Shader skyboxShader( "sbvtx.shader", "sbfr.shader" );
+	Shader * defaultShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/default.shader");
+	Shader * cityTileShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/cityTile.shader");
+	Shader * rockTileShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/rockTile.shader");
+     Shader skyboxShader( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/sbvtx.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/sbfr.shader" );
     
 	/*Adds the shaders to the discovery square. 
 	* Pls use the order from the tile.h const declarations*/
@@ -187,12 +187,12 @@ int main()
     
     // Cubemap (Skybox)
     vector<const GLchar*> faces;
-    faces.push_back( "desert_night_rt.tga" );
-    faces.push_back( "desert_night_lf.tga" );
-    faces.push_back( "desert_night_up.tga" );
-    faces.push_back( "desert_night_dn.tga" );
-    faces.push_back( "desert_night_bk.tga" );
-    faces.push_back( "desert_night_ft.tga" );
+    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_rt.tga" );
+    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_lf.tga" );
+    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_up.tga" );
+    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_dn.tga" );
+    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_bk.tga" );
+    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_ft.tga" );
     GLuint cubemapTexture = TextureLoading::LoadCubemap( faces );
     
     // END SKYBOX
@@ -205,16 +205,20 @@ int main()
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//Sets an empty VBO able to contain 500 points 
+	//Sets an empty VBO able to contain 1500 points 
 	/***** Can be changed later if necessary *****/
 	glBufferData(GL_ARRAY_BUFFER, 1500 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
 
-	// Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-	// TexCoord attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(0);
+    
+    // TexCoord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2);
+    
+    // TexType attribute
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(3);
 
 	glBindVertexArray(0); // Unbind VAO
 
@@ -222,6 +226,7 @@ int main()
 						  // Load and create a texture 
 	GLuint texture1;
 	GLuint texture2;
+    GLuint texture3;
 	// ====================
 	// Texture 1
 	// ====================
@@ -235,7 +240,7 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// Load, create texture and generate mipmaps
 	int width, height;
-	unsigned char* image = SOIL_load_image("texture1.jpg", &width, &height, 0, SOIL_LOAD_RGB);
+	unsigned char* image = SOIL_load_image("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/asphalteB.png", &width, &height, 0, SOIL_LOAD_RGB);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	SOIL_free_image_data(image);
@@ -252,11 +257,28 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// Load, create texture and generate mipmaps
-	image = SOIL_load_image("texture2.png", &width, &height, 0, SOIL_LOAD_RGB);
+	image = SOIL_load_image("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/houseH.png", &width, &height, 0, SOIL_LOAD_RGB);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	SOIL_free_image_data(image);
 	glBindTexture(GL_TEXTURE_2D, 0);
+    
+    //Setting the texture for roof
+    glGenTextures(1, &texture3);
+    glBindTexture(GL_TEXTURE_2D, texture3);
+    // Set our texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // Set texture filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // Load, create texture and generate mipmaps
+    image = SOIL_load_image("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/roof.png", &width, &height, 0, SOIL_LOAD_RGB);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    SOIL_free_image_data(image);
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
 
 
 	// Game loop
@@ -309,12 +331,23 @@ int main()
 				model = glm::translate(model, *(*tiles)[i][j]->getPosition());
 				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
+                // Bind Textures using texture units
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, texture1);
+                glUniform1i(glGetUniformLocation(cityTileShader -> Program, "ourTexture1"), 0);
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, texture2);
+                glUniform1i(glGetUniformLocation(cityTileShader -> Program, "ourTexture2"), 1);
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, texture3);
+                glUniform1i(glGetUniformLocation(cityTileShader -> Program, "ourTexture3"), 2);
+                
 				//Draws the arrays from the tile's options
 				/*****This needs to be changed to get dynamic values instead of 0, 6			******
 				***** or we will need to implement more than one draw for more than one object	*******
 				***** per tile, if so we will need to allow more than one shader per tile or	*******
 				***** create complex shaders													*******/
-				glDrawArrays((*tiles)[i][j]->drawType(), 0, (*tiles)[i][j]->getVertices()->size()/5);
+				glDrawArrays((*tiles)[i][j]->drawType(), 0, (*tiles)[i][j]->getVertices()->size()/6);
 			}
 		}
 		glBindVertexArray(0);
@@ -455,7 +488,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 }
 
 void Fog_Init () {
-    glClearColor(0.5f,0.5f,0.5f,1.0f);          // We'll Clear To The Color Of The Fog ( Modified )
+    glClearColor(0.5f,0.5f,0.5f,1.0f);          // We'll Clear To The Color Of The Fog
     glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
     glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
     glFogf(GL_FOG_DENSITY, 0.35f);              // How Dense Will The Fog Be
