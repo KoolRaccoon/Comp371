@@ -18,7 +18,7 @@
 #include "../glm/gtc/type_ptr.hpp"
 #include "Shader.h"
 #include "DiscoverySquare.h"
-#include "../SOIL2/SOIL2.h"
+#include "SOIL2.h"
 #include "stdafx.h"
 #include "Shader.h"
 #include "DiscoverySquare.h"
@@ -94,7 +94,8 @@ int main()
 	// Define the viewport dimensions
 	glViewport(0, 0, WIDTH, HEIGHT);
 
-
+	//GLfloat fogColor[4] = { 0.5, 0.5, 0.5, 1.0 };
+	//GLfloat fcamPos[3] = { cameraPos.x, cameraPos.y, cameraPos.z };
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);
 	//glFrontFace(GL_CCW);
@@ -103,7 +104,7 @@ int main()
 	Shader * defaultShader = new Shader("vertex.shader", "default.shader");
 	Shader * cityTileShader = new Shader("vertex.shader", "cityTile.shader");
 	Shader * rockTileShader = new Shader("vertex.shader", "rockTile.shader");
-    // Shader skyboxShader( "sbvtx.shader", "sbfr.shader" );
+     Shader skyboxShader( "sbvtx.shader", "sbfr.shader" );
     
 	/*Adds the shaders to the discovery square. 
 	* Pls use the order from the tile.h const declarations*/

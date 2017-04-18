@@ -1,10 +1,15 @@
 #include "DiscoverySquare.h"
 #include <iostream>
+#include <vector>
 
+vector<circle*> DiscoverySquare::cities;
 DiscoverySquare::DiscoverySquare(float xs, float zs, glm::vec3 cam)
 {
 	xSize = xs;
 	zSize = zs;
+	for (int i = 0; i < 4; i++)
+		cities.push_back(new circle(rand() % 10 + 5));
+		
 	usedData = new vector<vector<tile*>>;
 	initializeUsedData();
 }
@@ -18,7 +23,7 @@ DiscoverySquare::~DiscoverySquare()
 vector<vector<tile*>> * DiscoverySquare::update(glm::vec3 v)
 {
 	cout << v.x << " " << v.z << " " << endl;
-	cout << data.size() << endl;
+	//cout << data.size() << endl;
 	resetUsedData();
 	int xZero = (int)v.x - xSize / 2;
 	int zZero = (int)v.z - zSize / 2;
@@ -161,10 +166,10 @@ tile * DiscoverySquare::findTile(glm::vec3 nextCameraPosition)
 }
 unsigned int DiscoverySquare::selectTile(int x, int z)
 {
-	if ((x) <= 25 &&
-		(x) >= -25 &&
-		(z) <= 25 &&
-		(z) >= -25)
+	bool inside = false;
+	for (int i = 0; i < cities.size(); i++)
+		inside = inside || cities[i]->checkIfInside(x, z);
+	if(inside)
 		return (CITY);
 	else
 		return (ROCK);
