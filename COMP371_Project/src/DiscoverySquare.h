@@ -7,6 +7,8 @@
 #include "cityTileBuilder.h"
 #include "rockTileBuilder.h"
 #include "Shader.h"
+#include "Circle.h"
+#include <vector>
 
 using namespace std;
 //Class used to send a boundary of discovery to load new tiles
@@ -49,4 +51,6 @@ private:
 	vector<vector<tile*>> * usedData;
 
 	vector<Shader*> shaders;
+
+	static vector<circle*>  cities;
 };
