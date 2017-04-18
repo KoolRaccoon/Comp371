@@ -94,17 +94,16 @@ int main()
 	// Define the viewport dimensions
 	glViewport(0, 0, WIDTH, HEIGHT);
 
-	GLfloat fogColor[4] = { 0.5, 0.5, 0.5, 1.0 };
-	//GLfloat fcamPos[3] = { cameraPos.x, cameraPos.y, cameraPos.z };
+
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);
 	//glFrontFace(GL_CCW);
 
 	// Build and compile our shader program
-	Shader * defaultShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/default.shader");
-	Shader * cityTileShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/cityTile.shader");
-	Shader * rockTileShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/rockTile.shader");
-     Shader skyboxShader( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/sbvtx.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/sbfr.shader" );
+	Shader * defaultShader = new Shader("vertex.shader", "default.shader");
+	Shader * cityTileShader = new Shader("vertex.shader", "cityTile.shader");
+	Shader * rockTileShader = new Shader("vertex.shader", "rockTile.shader");
+    // Shader skyboxShader( "sbvtx.shader", "sbfr.shader" );
     
 	/*Adds the shaders to the discovery square. 
 	* Pls use the order from the tile.h const declarations*/
@@ -176,12 +175,12 @@ int main()
     
     // Cubemap (Skybox)
     vector<const GLchar*> faces;
-    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_rt.tga" );
-    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_lf.tga" );
-    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_up.tga" );
-    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_dn.tga" );
-    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_bk.tga" );
-    faces.push_back( "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/skybox/desert_night_ft.tga" );
+    faces.push_back( "desert_night_rt.tga" );
+    faces.push_back( "desert_night_lf.tga" );
+    faces.push_back( "desert_night_up.tga" );
+    faces.push_back( "desert_night_dn.tga" );
+    faces.push_back( "desert_night_bk.tga" );
+    faces.push_back( "desert_night_ft.tga" );
     GLuint cubemapTexture = TextureLoading::LoadCubemap( faces );
     
     // END SKYBOX
