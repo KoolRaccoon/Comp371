@@ -4,9 +4,9 @@
 class circle
 {
 public:
-	circle(int radius)
+	circle()
 	{
-		_r = radius;
+		_r = rand() % 10 + 5;
 		_k = -30 + rand() % 60;
 		_h = -30 + rand() % 60;
 		cout << _k << " " << _h << " " << _r << endl;

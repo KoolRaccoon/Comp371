@@ -8,7 +8,7 @@ DiscoverySquare::DiscoverySquare(float xs, float zs, glm::vec3 cam)
 	xSize = xs;
 	zSize = zs;
 	for (int i = 0; i < 4; i++)
-		cities.push_back(new circle(rand() % 10 + 5));
+		cities.push_back(new circle());
 		
 	usedData = new vector<vector<tile*>>;
 	initializeUsedData();
