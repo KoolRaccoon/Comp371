@@ -488,14 +488,14 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 }
 
 void Fog_Init () {
-    glClearColor(0.5f,0.5f,0.5f,1.0f);          // We'll Clear To The Color Of The Fog
-    glFogi(GL_FOG_MODE, fogMode[fogfilter]);        // Fog Mode
-    glFogfv(GL_FOG_COLOR, fogColor);            // Set Fog Color
-    glFogf(GL_FOG_DENSITY, 0.35f);              // How Dense Will The Fog Be
-    glHint(GL_FOG_HINT, GL_DONT_CARE);          // Fog Hint Value
-    glFogf(GL_FOG_START, 1.0f);             // Fog Start Depth
-    glFogf(GL_FOG_END, 5.0f);               // Fog End Depth
-    glEnable(GL_FOG);                   // Enables GL_FOG
+    glClearColor(0.5f,0.5f,0.5f,1.0f);
+    glFogi(GL_FOG_MODE, fogMode[fogfilter]);
+    glFogfv(GL_FOG_COLOR, fogColor);
+    glFogf(GL_FOG_DENSITY, 0.35f);
+    glHint(GL_FOG_HINT, GL_DONT_CARE);
+    glFogf(GL_FOG_START, 1.0f);
+    glFogf(GL_FOG_END, 5.0f);
+    glEnable(GL_FOG);
 }
 
 //Handles window resize
