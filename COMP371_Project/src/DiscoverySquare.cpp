@@ -3,6 +3,7 @@
 #include <vector>
 
 vector<circle*> DiscoverySquare::cities;
+//Initializes everything
 DiscoverySquare::DiscoverySquare(float xs, float zs, glm::vec3 cam)
 {
 	xSize = xs;
@@ -19,7 +20,7 @@ DiscoverySquare::~DiscoverySquare()
 	delete usedData;
 	usedData = nullptr;
 }
-
+//Updates the square centered around the camera and prints the camera's position
 vector<vector<tile*>> * DiscoverySquare::update(glm::vec3 v)
 {
 	cout << v.x << " " << v.z << " " << endl;
@@ -38,13 +39,17 @@ vector<vector<tile*>> * DiscoverySquare::update(glm::vec3 v)
 			&& z >= zZero
 			&& z <= zFinal)
 		{
+			//Loads the preexisting tiles
 			(*usedData)[x - xZero][z - zZero] = data[i];
 		}
 	}
+	//Creates new tiles
 	createTiles(xZero, zZero);
 
 	return usedData;
 }
+
+//Resets usedData to contain only empty tiles
 void DiscoverySquare::resetUsedData()
 {
 	tile * tempTile = new tile();
@@ -56,6 +61,7 @@ void DiscoverySquare::resetUsedData()
 		}
 	}
 }
+//Initializes the dynamic container usedData
 void DiscoverySquare::initializeUsedData()
 {
 	tile * tempTile = new tile();
@@ -66,10 +72,11 @@ void DiscoverySquare::initializeUsedData()
 		{
 			temp.push_back(tempTile);
 		}
-		usedData->emplace_back(temp);
+		usedData->push_back(temp);
 	}
 }
 
+//Checks if theres a collision the movement on each axis and returns the new good position
 glm::vec3 DiscoverySquare::checkCollision(glm::vec3 currentPos, glm::vec3 nextPos)
 {
 	tile * t = findTile(nextPos);
@@ -94,9 +101,11 @@ glm::vec3 DiscoverySquare::checkCollision(glm::vec3 currentPos, glm::vec3 nextPo
 	goody = t->checkCollision(&tiley);
 	goodz = t->checkCollision(&tilez);
 
+	//Bump the camera up a bit to avoid blocking
 	if ((goodx || goodz) && t->tileType() == ROCK)
 		currentPos.y += 0.05f;
 
+	//Only add the movement if there is no collision
 	glm::vec3 realPos = glm::vec3
 	(!goodx * distx + currentPos.x,
 		!goody * disty + currentPos.y,
@@ -104,12 +113,14 @@ glm::vec3 DiscoverySquare::checkCollision(glm::vec3 currentPos, glm::vec3 nextPo
 	return realPos;
 }
 
+//Similar to update but for the intial camera position
 vector<vector<tile*>> * DiscoverySquare::initializeSquare()
 {
 	createTiles(-(xSize / 2), -(zSize / 2));
 	return usedData;
 }
 
+//Check if a tile is empty then creates a new one if necessary
 void DiscoverySquare::createTiles(int x, int z)
 {
 	int count = 0;
@@ -119,9 +130,13 @@ void DiscoverySquare::createTiles(int x, int z)
 		{
 			if ((*usedData)[i][j]->tileType() == EMPTY)
 			{
+				//Increment the data size
 				count++;
+				//Gets the new tile's position
 				glm::vec3 * pos = new glm::vec3(i + x, 0.0f, j + z);
+				//Figure out which type of tile needs to be created
 				unsigned int type = selectTile(i + x, j + z);
+				//Selects the right builder, creates the tile and adds it to usedData and data
 				switch (type)
 				{
 				case 1:
@@ -142,7 +157,6 @@ void DiscoverySquare::createTiles(int x, int z)
 					data.push_back(rtb->getTile());
 					delete rtb;
 					rtb = nullptr;
-					//cout << "Creating rock tile" << endl;
 					break;
 				}
 				}
@@ -150,10 +164,12 @@ void DiscoverySquare::createTiles(int x, int z)
 		}
 	}
 }
+//Converts the world coordinates to coordinates bound by -0.5f and 0.5f
 glm::vec3 DiscoverySquare::toTileCoord(glm::vec3 wp, glm::vec3 * tp)
 {
 	return glm::vec3(wp.x-tp->x, wp.y-tp->y, wp.z-tp->z);
 }
+//Finds which tile the camera's new position is standing on
 tile * DiscoverySquare::findTile(glm::vec3 nextCameraPosition)
 {
 	
@@ -162,8 +178,9 @@ tile * DiscoverySquare::findTile(glm::vec3 nextCameraPosition)
 			if ((*usedData)[i][j]->getPosition()->x == roundf(nextCameraPosition.x) &&
 				(*usedData)[i][j]->getPosition()->z == roundf(nextCameraPosition.z))
 				return (*usedData)[i][j];
-    return NULL;
+    return nullptr;
 }
+//Check if the position is inside one of the city circles
 unsigned int DiscoverySquare::selectTile(int x, int z)
 {
 	bool inside = false;
@@ -174,56 +191,8 @@ unsigned int DiscoverySquare::selectTile(int x, int z)
 	else
 		return (ROCK);
 }
+//Adds a shader to the shader bank
 void DiscoverySquare::addShader(Shader * s)
 {
 	shaders.push_back(s);
 }
-/*
-std::vector<glm::vec3> DiscoverySquare::getTransl(glm::vec3 v)
-{
-	std::vector<glm::vec3> transl;
-	//Checks where the camera has stepped out and then
-	//creates a new line of tiles on the side where the camera
-	//has stepped out.
-	if (v.x < _minX)
-	{
-		_minX --;
-		
-		for (float i = _shownMinZ; i <= _shownMaxZ; i++)
-		{
-			transl.push_back(glm::vec3(_shownMinX, 0.0f, i));
-		}
-		_shownMinX--;
-	}
-	if (v.x > _maxX)
-	{
-		_maxX ++;
-		
-		for (float i = _shownMinZ; i <= _shownMaxZ; i++)
-		{
-			transl.push_back(glm::vec3(_shownMaxX, 0.0f, i));
-		}
-		_shownMaxX++;
-	}
-	if (v.z < _minZ)
-	{
-		_minZ --;
-		
-		for (float i = _shownMinX; i <= _shownMaxX; i++)
-		{
-			transl.push_back(glm::vec3(i, 0.0f, _shownMinZ));
-		}
-		_shownMinZ--;
-	}
-	if (v.z > _maxZ)
-	{
-		_maxZ ++;
-		
-		for (float i = _shownMinX; i <= _shownMaxX; i++)
-		{
-			transl.push_back(glm::vec3(i, 0.0f, _shownMaxZ));
-		}
-		_shownMaxZ++;
-	}
-	return transl;
-}*/

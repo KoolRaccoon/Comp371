@@ -59,6 +59,8 @@ void cityTileBuilder::createTile()
 	build();
 }
 
+/*Randomly chooses one of the 4 possible configuration
+* of either 1, 2, 3 or 4 buildings on a single tile */
 void cityTileBuilder::_createBuildings(vector<GLfloat>* v)
 {
 	switch (rand()%4 + 1)
@@ -76,8 +78,17 @@ void cityTileBuilder::_createBuildings(vector<GLfloat>* v)
 		_quadBuilding();
 		break;
 	}
+	//Converts the building into vertices
 	_convertToVertices(v);
 }
+/*
+*		All four _xbuilding() methods work the same way:
+*		a width and length is calculated for each building
+*		then a position is calculated and finally a height.
+*		Afterwards, each building is added to the tile
+*/
+
+
 
 void cityTileBuilder::_singleBuilding()
 {
@@ -98,7 +109,6 @@ void cityTileBuilder::_singleBuilding()
 
 void cityTileBuilder::_dualBuilding()
 {
-	//size of one side of the square
 	
 	float widthUp = randHalfSize();
 	float lengthUp = randQuarterSize();
@@ -131,7 +141,6 @@ void cityTileBuilder::_dualBuilding()
 
 void cityTileBuilder::_tripleBuilding()
 {
-	//size of one side of the square
 
 	float widthUp1 = randQuarterSize();
 	float lengthUp1 = randQuarterSize();
@@ -223,10 +232,11 @@ void cityTileBuilder::_quadBuilding()
 	_tile->addBuilding(b4);
 }
 
+//Not implemented
 void cityTileBuilder::_rotateBuilding(vector<glm::vec3>* b)
 {
 }
-
+ //Converts each of the buildings into vertices
 void cityTileBuilder::_convertToVertices(vector<GLfloat>* v)
 {
 	vector<building*> * b = _tile->getBuildings();
@@ -235,7 +245,7 @@ void cityTileBuilder::_convertToVertices(vector<GLfloat>* v)
 		_convertBuilding(v, (*b)[i]);
 	}
 }
-
+//Converts a building into vertices depending on which half it is part of
 void cityTileBuilder::_convertBuilding(vector<GLfloat>* v, building * b)
 {
 	if(b->getCenter()->z > 0.0)
@@ -244,9 +254,9 @@ void cityTileBuilder::_convertBuilding(vector<GLfloat>* v, building * b)
 		_convertBotHalf(v, b);
 }
 
+
 void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 {
-	//size of one side of the square
 	float w = b->getWidth();
 	float h = b->getHeight();
 	float l = b->getLength();
@@ -264,6 +274,8 @@ void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 	*		|	\__		|
 	*start->.		\-->.
 	*/
+
+	//Start the the middle of the tile
 	v->push_back(0.0f);
 	v->push_back(0.0f);
 	v->push_back(0.0f);
@@ -279,6 +291,7 @@ void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 	v->push_back(0.0f);
 	//v->push_back(0.0f);
 
+	//Connect to the middle of the building
 	v->push_back(c->x - w / 2);
 	v->push_back(0);
 	v->push_back(c->z - l / 2);
@@ -286,7 +299,6 @@ void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 	v->push_back(0.0f);
 	v->push_back(0.0f);
 
-
 	v->push_back(c->x - w / 2);
 	v->push_back(0);
 	v->push_back(c->z - l / 2);
@@ -294,7 +306,9 @@ void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 	v->push_back(0.0f);
 	v->push_back(0.0f);
 	//v->push_back(0.0f);
-	//From top view, push bottom left, up and down
+
+
+	//push bottom left
 	for (int i = 0; i <= 1; i++)
 	{
 		v->push_back(c->x - w / 2);
@@ -306,7 +320,7 @@ void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 		//v->push_back(0.0f);
 	}
 
-	//top left
+	//top left twice
 	for (int j = 0; j < 2; j++)
 	{
 		for (int i = 0; i <= 1; i++)
@@ -319,7 +333,7 @@ void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 			//v->push_back(0.0f);
 		}
 	}
-	//top right
+	//top right twice
 	for (int j = 0; j < 2; j++)
 	{
 		for (int i = 0; i <= 1; i++)
@@ -332,7 +346,7 @@ void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 			//v->push_back(0.0f);
 		}
 	}
-	//bottom right
+	//bottom right twice
 	for (int j = 0; j < 2; j++)
 	{
 		for (int i = 0; i <= 1; i++)
@@ -356,13 +370,16 @@ void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 		//v->push_back(0.0f);
 	}
 	//push roof square
-	//top view, bottom left
+	//top view: 
+
+	//bottom left
 	v->push_back(c->x - w / 2);
 	v->push_back(h);
 	v->push_back(c->z - l / 2);
 	v->push_back(0.0f);
 	v->push_back(0.0f);
 	//v->push_back(0.0f);
+
 	//bottom right
 	v->push_back(c->x + w / 2);
 	v->push_back(h);
@@ -370,6 +387,7 @@ void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 	v->push_back(0.0f);
 	v->push_back(0.0f);
 	//v->push_back(0.0f);
+
 	//top left
 	v->push_back(c->x - w / 2);
 	v->push_back(h);
@@ -377,6 +395,7 @@ void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 	v->push_back(0.0f);
 	v->push_back(0.0f);
 	//v->push_back(0.0f);
+
 	//top right
 	v->push_back(c->x + w / 2);
 	v->push_back(h);
@@ -385,7 +404,7 @@ void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 	v->push_back(0.0f);
 	//v->push_back(0.0f);
 
-
+	//Reconnect to the center of the building
 	v->push_back(c->x);
 	v->push_back(0.0f);
 	v->push_back(c->z);
@@ -403,7 +422,7 @@ void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 
 void cityTileBuilder::_convertBotHalf(vector<GLfloat>* v, building * b)
 {
-	//size of one side of the square
+	
 	float w = b->getWidth();
 	float h = b->getHeight();
 	float l = b->getLength();
@@ -411,16 +430,17 @@ void cityTileBuilder::_convertBotHalf(vector<GLfloat>* v, building * b)
 	glm::vec3 * c = b->getCenter();
 
 	/*	top view of the calls
-	*		.---------->.
+	*		.---------->.<-start
 	*		^			|
 	*		|			v
-	*start->.<----------.
+	*		.<----------.
 	*	and rooftop
-	*		.			.
-	*		^\__		^
-	*		|	\__		|
-	*start->.		\-->.
+	*		.			.<-start
+	*		^			|
+	*		|			v
+	*		.<----------.
 	*/
+	//Start at the center of the tile
 	v->push_back(0.0f);
 	v->push_back(0.0f);
 	v->push_back(0.0f);
@@ -429,7 +449,6 @@ void cityTileBuilder::_convertBotHalf(vector<GLfloat>* v, building * b)
 	v->push_back(0.0f);
 	//v->push_back(0.0f);
 
-
 	v->push_back(0.0f);
 	v->push_back(0.0f);
 	v->push_back(0.0f);
@@ -438,13 +457,13 @@ void cityTileBuilder::_convertBotHalf(vector<GLfloat>* v, building * b)
 	v->push_back(0.0f);
 	//v->push_back(0.0f);
 
+	//Connect to the center of the building
 	v->push_back(c->x - w / 2);
 	v->push_back(0);
 	v->push_back(c->z - l / 2);
 	//texture coords set to 0.0 for now.
 	v->push_back(0.0f);
 	v->push_back(0.0f);
-
 
 	v->push_back(c->x - w / 2);
 	v->push_back(0);
@@ -550,6 +569,7 @@ void cityTileBuilder::_convertBotHalf(vector<GLfloat>* v, building * b)
 	v->push_back(0.0f);
 	//v->push_back(0.0f);
 	
+	//Reconnect to the center of the tile
 	v->push_back(c->x);
 	v->push_back(0.0f);
 	v->push_back(c->z);
@@ -565,6 +585,7 @@ void cityTileBuilder::_convertBotHalf(vector<GLfloat>* v, building * b)
 
 }
 
+//Calculates a random height between 1.0f and 3.0f
 float cityTileBuilder::randHeight()
 {
 	return (rand() % 200 + 100) / 100.0f;
