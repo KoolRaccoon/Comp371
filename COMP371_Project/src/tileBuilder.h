@@ -1,9 +1,21 @@
+/**
+tileBuilder.h
+Purpose: Builder pattern superclass allowing
+		the definition of tile builder subclasses
+		such as cityTileBuilder and rockTileBuilder.
+		Contains the randomly generated tile.
+
+@super tileBuilder.h
+@author Keven Presseau-St-Laurent
+@version final 2017/04/18
+*/
 #pragma once
 #include "tile.h"
 
 class tileBuilder
 {
 public:
+	//Parameter Constructor
 	tileBuilder(Shader * s, glm::vec3 * pos)
 	{
 		_shader = s;

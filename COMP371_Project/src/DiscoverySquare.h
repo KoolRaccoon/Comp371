@@ -1,3 +1,18 @@
+/**
+DiscoverySquare.h
+Purpose: Contains the data of all generated tiles.
+		Also creates a square around the camera's
+		position where all the tiles that are to be drawn
+		are generated. If a tile already exists it gets it
+		from its data, if not it creates it using random parameters.
+		It uses a factory builder pattern to generate the right 
+		tile.
+
+@super tileBuilder.h
+@author Keven Presseau-St-Laurent
+@version final 2017/04/18
+*/
+
 #pragma once
 #include "../glm/glm.hpp"
 #include "../glm/gtc/matrix_transform.hpp"
@@ -30,7 +45,10 @@ public:
 	void addShader(Shader * shader);
 	//Creates the initial used data. 
 	void initializeUsedData();
+	/*Recieves the camera's current and next hypothetic position
+	* then returns a new camera position that is outside terrain/objects*/
 	glm::vec3 checkCollision(glm::vec3 currentCameraPos, glm::vec3 nextCameraPosistion);
+	//Returns what type of tile is at this position in the world
 	static unsigned int selectTile(int worldx, int worldz);
 
 
@@ -38,9 +56,14 @@ private:
 	
 	//Creates tiles for each tile of type EMPTY in usedData
 	void createTiles(int smallestX, int smallestZ);
+
+	//Converts world coordinates into tile coordinates
 	glm::vec3 toTileCoord(glm::vec3 worldPosition, glm::vec3 * tilePosition);
+	
+	//Returns the tile under the camera's position
 	tile * findTile(glm::vec3 nextCameraPosition);
 
+	//Load size
 	float xSize;
 	float zSize;
 	
@@ -52,5 +75,6 @@ private:
 
 	vector<Shader*> shaders;
 
+	//List of circles that are cities
 	static vector<circle*>  cities;
 };

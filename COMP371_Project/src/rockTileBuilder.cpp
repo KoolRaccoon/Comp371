@@ -13,7 +13,7 @@ void rockTileBuilder::buildType()
 {
 	_tile->setTileType(ROCK);
 }
-
+//Initializes the grid, fills it with known data and calculate the rest and converts it
 void rockTileBuilder::buildVertices()
 {
 	initializeGrid();
@@ -37,9 +37,9 @@ void rockTileBuilder::buildPosition()
 	_tile->setPosition(_position);
 }
 
+//Creates tile and initializes its grid and the builder's two grids
 void rockTileBuilder::createTile()
 {
-	//Creates tile and initializes its grid and the builder's two grids
 	_tile = new rockTile;
 	vector<vector<GLfloat>> * g = new vector<vector<GLfloat>>;
 	vector<GLfloat> temp;
@@ -61,12 +61,13 @@ void rockTileBuilder::initializeGrid()
 {
 	float x = _position->x;
 	float z = _position->z;
-	//Checks to see if a tile exists left right down or up 
-	//of the current tile and sets the grids accordingly
+	/*Checks to see if a tile exists left right down or up 
+	*of the current tile and sets the grids accordingly
+	*Also checks if the non-initialized tiles surrounding it
+	*might be of type city, if so act as if it is initialized*/
 	if ((_i - 1) >= 0)
 	{
 		setLeft((*_data)[_i - 1][_j]->tileType());
-		//cout << "setLeft" << endl;
 	}
  	else if((DiscoverySquare::selectTile(x - 1, z)) == CITY)
 	{
@@ -76,7 +77,6 @@ void rockTileBuilder::initializeGrid()
 	if ((_i + 1) < (*_data).size())
 	{
 		setRight((*_data)[_i + 1][_j]->tileType());
-		//cout << "setRight" << endl;
 	}
 	else if ((DiscoverySquare::selectTile(x + 1, z)) == CITY)
 	{
@@ -85,7 +85,6 @@ void rockTileBuilder::initializeGrid()
 	if ((_j + 1) < (*_data)[_i].size())
 	{
 		setUp((*_data)[_i][_j + 1]->tileType()); 
-		//cout << "setUp" << endl;
 	}
 	else if ((DiscoverySquare::selectTile(x, z + 1)) == CITY)
 	{
@@ -94,7 +93,6 @@ void rockTileBuilder::initializeGrid()
 	if ((_j - 1) >= 0)
 	{
 		setDown((*_data)[_i][_j - 1]->tileType()); 
-		//cout << "setDown" << endl;
 	}
 	else if ((DiscoverySquare::selectTile(x, z - 1)) == CITY)
 	{
@@ -170,15 +168,14 @@ vector<GLfloat>* rockTileBuilder::convertGrid()
 			vertices->push_back(0.0f);
 			vertices->push_back(0.0f);
 			//vertices->push_back(0.0f);
-			//cout << (*grid)[i][j] << " ";
+			
 			vertices->push_back(-0.5f + i*offset);
 			vertices->push_back((*grid)[i][j]);
 			vertices->push_back(-0.5f + (j)*offset);
 			vertices->push_back(0.0f);
 			vertices->push_back(0.0f);
 			//vertices->push_back(0.0f);
-			//cout << (*grid)[i][j + 1];
-
+			
 			if (j == _size - 1)
 			{
 				vertices->push_back(-0.5f + (i+1)*offset);
@@ -293,7 +290,6 @@ void rockTileBuilder::fillLeft()
 			if (height < 0)
 				height = 0;
 			fillLR[i][j] += height;
-			//fillLR[i][j] = random();
 		}
 	}
 }
@@ -311,7 +307,6 @@ void rockTileBuilder::fillRight()
 			if (height < 0)
 				height = 0;
 			fillLR[i][j] += height;
-			//fillLR[i][j] = random();
 		}
 	}
 }
@@ -329,7 +324,6 @@ void rockTileBuilder::fillUp()
 			if (height < 0)
 				height = 0;
 			fillUD[i][j] += height;
-			//fillUD[i][j] = random();
 		}
 	}
 }
@@ -347,14 +341,12 @@ void rockTileBuilder::fillDown()
 			if (height < 0)
 				height = 0;
 			fillUD[i][j] += height;
-			//fillUD[i][j] = random();
 		}
 	}
 }
 
 void rockTileBuilder::fillLeftRight()
 {
-	cout << "LeftRight" << endl;
 	fillLeft();
 	fillRight();
 	for (int i = left; i < _size - right; i++)
@@ -368,7 +360,6 @@ void rockTileBuilder::fillLeftRight()
 
 void rockTileBuilder::fillUpDown()
 {
-	cout << "UpDown" << endl;
 	fillUp();
 	fillDown();
 	for (int i = left; i < _size - right; i++)
