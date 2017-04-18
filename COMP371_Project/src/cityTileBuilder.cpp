@@ -61,6 +61,8 @@ void cityTileBuilder::createTile()
     build();
 }
 
+/*Randomly chooses one of the 4 possible configuration
+* of either 1, 2, 3 or 4 buildings on a single tile */
 void cityTileBuilder::_createBuildings(vector<GLfloat>* v)
 {
     switch (rand()%4 + 1)
@@ -80,6 +82,14 @@ void cityTileBuilder::_createBuildings(vector<GLfloat>* v)
     }
     _convertToVertices(v);
 }
+/*
+*		All four _xbuilding() methods work the same way:
+*		a width and length is calculated for each building
+*		then a position is calculated and finally a height.
+*		Afterwards, each building is added to the tile
+*/
+
+
 
 void cityTileBuilder::_singleBuilding()
 {
@@ -128,7 +138,6 @@ void cityTileBuilder::_dualBuilding()
     
     _tile->addBuilding(b1);
     _tile->addBuilding(b2);
-    
 }
 
 void cityTileBuilder::_tripleBuilding()
@@ -225,10 +234,11 @@ void cityTileBuilder::_quadBuilding()
     _tile->addBuilding(b4);
 }
 
+//Not implemented
 void cityTileBuilder::_rotateBuilding(vector<glm::vec3>* b)
 {
 }
-
+ //Converts each of the buildings into vertices
 void cityTileBuilder::_convertToVertices(vector<GLfloat>* v)
 {
     vector<building*> * b = _tile->getBuildings();
@@ -237,7 +247,7 @@ void cityTileBuilder::_convertToVertices(vector<GLfloat>* v)
         _convertBuilding(v, (*b)[i]);
     }
 }
-
+//Converts a building into vertices depending on which half it is part of
 void cityTileBuilder::_convertBuilding(vector<GLfloat>* v, building * b)
 {
     if(b->getCenter()->z > 0.0){
@@ -246,6 +256,7 @@ void cityTileBuilder::_convertBuilding(vector<GLfloat>* v, building * b)
     else
         _convertBotHalf(v, b);
 }
+
 
 void cityTileBuilder::_convertTopHalf(vector<GLfloat>* v, building * b)
 {
@@ -577,9 +588,9 @@ void cityTileBuilder::_convertBotHalf(vector<GLfloat>* v, building * b)
     v->push_back(0.0f);
     v->push_back(0.0f);
     v->push_back(2.0f);
-    
 }
 
+//Calculates a random height between 1.0f and 3.0f
 float cityTileBuilder::randHeight()
 {
     return (rand() % 200 + 100) / 100.0f;

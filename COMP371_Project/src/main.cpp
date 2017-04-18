@@ -32,12 +32,15 @@ using namespace std;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
 void do_movement();
 
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
 
 // Camera
+//Taken from Learnopengl.com
 glm::vec3 cameraPos = glm::vec3(0.5f, 1.0f, 0.5f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -46,38 +49,29 @@ GLfloat pitch = 0.0f;
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 GLfloat fov = 45.0f;
-//Discovery Square
+//Discovery Square data
 //Initial square size of sizeX * sizeZ HAS TO BE AN EVEN NUMBER
 float sizeX = 40;
 float sizeZ = 40;
 //Creates a square around the camera's initial position
 DiscoverySquare DS(sizeX, sizeZ, cameraPos);
 
+//Matrix containing all the tiles inside the DS
 vector<vector<tile*>> * tiles;
-bool keys[1024];
 
+bool keys[1024];
+bool mouseEnabled = false;
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
 
 							// The MAIN function, from here we start the application and run the game loop
 							// The MAIN function, from here we start the application and run the game loop
-//*****FOG*****
-bool   gp = false;                      // G Pressed? ( New )
-GLuint filter;                      // Which Filter To Use
-GLuint fogMode[]= { GL_EXP, GL_EXP2, GL_LINEAR };   // Storage For Three Types Of Fog
-GLuint fogfilter= 2;                    // Which Fog To Use
-GLfloat fogColor[4]= {0.5f, 0.5f, 0.5f, 1.0f};      // Fog Color
-void Fog_Init();
-//*****FOG*****
-
-
 int main()
 {
 	srand (time(NULL));
 	// Init GLFW
-	glfwInit();
-    
+	glfwInit(); 
 	// Set all the required options for GLFW
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -93,7 +87,7 @@ int main()
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
-
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	// GLFW Options
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -101,15 +95,12 @@ int main()
 	glewExperimental = GL_TRUE;
 	// Initialize GLEW to setup the OpenGL Function pointers
 	glewInit();
-    Fog_Init();
+
 	// Define the viewport dimensions
 	glViewport(0, 0, WIDTH, HEIGHT);
 
-	//GLfloat fogColor[4] = { 0.5, 0.5, 0.5, 1.0 };
-	//GLfloat fcamPos[3] = { cameraPos.x, cameraPos.y, cameraPos.z };
+	
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
-	//glFrontFace(GL_CCW);
 
 	// Build and compile our shader program
 	Shader * defaultShader = new Shader("/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/vertex.shader", "/Users/Felix/school/University/Winter_2017/COMP_371/Procedural_World_COMP_371/COMP371_Project/Comp371/COMP371_Project/src/default.shader");
@@ -209,8 +200,8 @@ int main()
 	/***** Can be changed later if necessary *****/
 	glBufferData(GL_ARRAY_BUFFER, 1500 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(1);
     
     // TexCoord attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
@@ -387,6 +378,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	//Allows the user to enable and disable the mouse
+	if (key == GLFW_KEY_M && action == GLFW_PRESS && !mouseEnabled)
+	{
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		mouseEnabled = true;
+	}
+	else if (key == GLFW_KEY_M && action == GLFW_PRESS && mouseEnabled)
+	{
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		mouseEnabled = false;
+	}
+		
 	if (key >= 0 && key < 1024)
 	{
 		if (action == GLFW_PRESS)
@@ -394,24 +397,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		else if (action == GLFW_RELEASE)
 			keys[key] = false;
 	}
-    //*****FOG KEYS*****
-    if (key == GLFW_KEY_G && action == GLFW_PRESS)
-    {
-        gp=true;
-        fogfilter+=1;
-        if (fogfilter>2)
-            fogfilter=0;
-        glFogi(GL_FOG_MODE, fogMode[fogfilter]);
-    }
-    
-    if (key == GLFW_KEY_O && action == GLFW_PRESS)
-        gp=false;
-    //*****FOG KEYS*****
 }
 
 void do_movement()
 {
-	// Camera controls with tiles update on movement
+	// Camera controls with tiles update on movement and collision detection
 	GLfloat cameraSpeed = 2.0f * deltaTime;
 	if (keys[GLFW_KEY_W])
 	{
@@ -437,8 +427,6 @@ void do_movement()
 	{
 		cameraPos += glm::vec3(0.0f, cameraSpeed, 0.0f);
 	}
-	//Checks if the camera has moved outside the boundary
-
 }
 
 bool firstMouse = true;
@@ -486,18 +474,18 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	if (fov >= 45.0f)
 		fov = 45.0f;
 }
-
+/*
 void Fog_Init () {
     glClearColor(0.5f,0.5f,0.5f,1.0f);
-    glFogi(GL_FOG_MODE, fogMode[fogfilter]);
-    glFogfv(GL_FOG_COLOR, fogColor);
+    //glFogi(GL_FOG_MODE, fogMode[fogfilter]);
+    //glFogfv(GL_FOG_COLOR, fogColor);
     glFogf(GL_FOG_DENSITY, 0.35f);
     glHint(GL_FOG_HINT, GL_DONT_CARE);
     glFogf(GL_FOG_START, 1.0f);
     glFogf(GL_FOG_END, 5.0f);
     glEnable(GL_FOG);
 }
-
+*/
 //Handles window resize
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {

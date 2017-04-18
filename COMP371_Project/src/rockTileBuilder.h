@@ -1,4 +1,13 @@
-#pragma once
+/**
+rockTileBuilder.h
+Purpose: Subclass of rockBuilder.h, builds a tile of
+type ROCK and sets its parameters randomly
+and then calculates all the resulting vertices.
+
+@super tileBuilder.h
+@author Keven Presseau-St-Laurent
+@version final 2017/04/18
+*/
 #pragma once
 #include "stdafx.h"
 #include "tileBuilder.h"

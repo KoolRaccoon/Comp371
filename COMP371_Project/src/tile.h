@@ -1,3 +1,12 @@
+/**
+tile.h
+Purpose: Contains the necessary data to be drawn on screen.
+		Also contains const data to represent tile types
+
+@author Keven Presseau-St-Laurent
+@version final 2017/04/18
+*/
+
 #pragma once
 #include "stdafx.h"
 #include "Shader.h"
@@ -29,8 +38,11 @@ public:
 	Shader * getShader();
 	//Returns a pointer to the position of the tile, you can also use x and z
 	glm::vec3 * getPosition();
+	//Returns true if the position inside a collision. Calls the right method dynamically
 	virtual bool checkCollision(glm::vec3 * position) { return false; }
+	//Calls rockTile's getGrid or returns a nullptr
 	virtual vector<vector<GLfloat>> * getGrid() { return nullptr; };
+	//Calls cityTile's getBuildings or returns a nullptr
 	virtual vector<building*> * getBuildings() { return nullptr; };
 
 	/*

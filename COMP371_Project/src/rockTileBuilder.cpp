@@ -13,7 +13,7 @@ void rockTileBuilder::buildType()
 {
     _tile->setTileType(ROCK);
 }
-
+//Initializes the grid, fills it with known data and calculate the rest and converts it
 void rockTileBuilder::buildVertices()
 {
     initializeGrid();
@@ -37,6 +37,7 @@ void rockTileBuilder::buildPosition()
     _tile->setPosition(_position);
 }
 
+//Creates tile and initializes its grid and the builder's two grids
 void rockTileBuilder::createTile()
 {
     //Creates tile and initializes its grid and the builder's two grids
@@ -305,6 +306,7 @@ void rockTileBuilder::fillLeft()
 
 void rockTileBuilder::fillRight()
 {
+
     vector<vector<GLfloat> > * grid = _tile->getGrid();
     float height;
     
@@ -337,6 +339,7 @@ void rockTileBuilder::fillUp()
             //fillUD[i][j] = random();
         }
     }
+
 }
 
 void rockTileBuilder::fillDown()
@@ -355,6 +358,7 @@ void rockTileBuilder::fillDown()
             //fillUD[i][j] = random();
         }
     }
+
 }
 
 void rockTileBuilder::fillLeftRight()
